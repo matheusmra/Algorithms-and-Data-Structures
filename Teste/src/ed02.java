@@ -34,7 +34,7 @@ public class ed02 {
         }
     }
     public static boolean isIntervalo(int numero){
-        if(numero >= 25 && numero <= 45){
+        if(numero > 25 && numero < 45){
             return true;
         }else{
             return false;
@@ -51,7 +51,21 @@ public class ed02 {
     }
 
     public static boolean isIntervalo2(int numero){
-        if(numero > 20 && numero < 60)
+        if(numero >= 20 && numero <= 60){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public static void ex0214(Scanner ler){
+        System.out.println("Valor =");
+        int x = ler.nextInt();
+        if(isIntervalo2(x)){
+            System.out.println("O numero " + x + " pertence ao intervalo fechado entre 20 e 60");
+        }else{
+            System.out.println("O numero nao pertence ao intervalo");
+        }
     }
 
     public static void main(String[] args) {
@@ -74,6 +88,12 @@ public class ed02 {
                     break;
                 case 3:
                     ex0213(ler);
+                    break;
+                case 4:
+                    ex0214(ler);
+                    break;
+                case 5:
+                    ex0215(ler);
                     break;
                 default:
                     System.out.print("\nERRO: OPCAO INVALIDA\n\n");
