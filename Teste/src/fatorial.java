@@ -1,4 +1,5 @@
 package Teste.src;
+import java.util.Scanner;
 
 public class fatorial {
     public static int fatorial(int numero) {
@@ -9,6 +10,9 @@ public class fatorial {
         }
     }
     public static void main(String[] args) {
-        System.out.println(fatorial(5));
+        Scanner ler = new Scanner(System.in);
+        System.out.print("Digite o valor: ");
+        int x = ler.nextInt();
+        System.out.println(fatorial(x));
     }
 }
