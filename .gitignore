@@ -1,5 +1,6 @@
 # Ignorar pastas e arquivos gerados pelo IntelliJ/JetBrains
 .idea/
+.out/
 *.iml
 *.ipr
 *.iws
