@@ -68,6 +68,21 @@ public class ed02 {
         }
     }
 
+    public static boolean isIntersection(int numero){
+        if(numero >= 15 && numero <= 25){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    public static void ex0215(Scanner ler){
+        System.out.println("Valor =");
+        int x = ler.nextInt();
+        if(isIntersection(x)){
+            System.out.println("O valor esta na interseção dos intervalos");
+        }
+    }
+
     public static void main(String[] args) {
         int opcao;
         do {
