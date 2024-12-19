@@ -35,6 +35,33 @@ public class ed03 {
         System.out.println("Total de letras em Uppercase = " + t);
         showUpperLetters(nome);
     }
+    public static int countLower(String n){
+        int count = 0;
+        for(int i = 0; i < n.length(); i++){
+            char c = n.charAt(i);
+            if(c >= 'a' && c <= 'z'){
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public static void showLower(String n){
+        for(int i = 0; i < n.length(); i++){
+            char c = n.charAt(i);
+            if(c >= 'a' && c <= 'z'){
+                System.out.println(c);
+            }
+        }
+    }
+
+    public static void ex0313(Scanner ler){
+        ler.nextLine();
+        System.out.println("Palavra = ");
+        String n = ler.nextLine();
+        System.out.println("Total de letras em lowerCase = " + countLower(n));
+        showLower(n);
+    }
     public static void main(String[] args) {
         int opcao;
         do {
@@ -52,6 +79,9 @@ public class ed03 {
                     break;
                 case 2:
                     ex0312(ler);
+                    break;
+                case 3:
+                    ex0313(ler);
                     break;
                 default:
                     System.out.print("\nERRO: OPCAO INVALIDA\n\n");
