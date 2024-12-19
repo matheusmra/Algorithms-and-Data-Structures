@@ -154,6 +154,31 @@ public class ed03 {
         System.out.println("Total de palavras que não são letras e numeros: " + countNonWD(n));
         showNonWD(n);
     }
+    public static int countFive(int[] array,int a , int b){
+        int count = 0;
+        for(int i = 0; i < array.length; i++){
+            if(array[i] %5 == 0 && array[i] > a && array[i] < b){
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public static void ex0317(Scanner ler){
+        ler.nextLine();
+        System.out.println("Valor de A = ");
+        int a = ler.nextInt();
+        System.out.println("Valor de B = ");
+        int b = ler.nextInt();
+        System.out.println("Valor de n");
+        int n = ler.nextInt();
+        int[] array = new int [n];
+        for(int i = 0; i < n; i++){
+            System.out.println("Valor da posição: " + i);
+            array[i] = ler.nextInt();
+        }
+                System.out.println("Total de números que são multiplos de 5 e estão entre o intervalo " + a + " e " + b + ":" + countFive(array,a,b));
+    }
     public static void main(String[] args) {
         int opcao;
         do {
@@ -183,6 +208,9 @@ public class ed03 {
                     break;
                 case 6:
                     ex0316(ler);
+                    break;
+                case 7:
+                    ex0317(ler);
                     break;
                 default:
                     System.out.print("\nERRO: OPCAO INVALIDA\n\n");
