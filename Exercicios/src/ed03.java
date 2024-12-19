@@ -91,6 +91,68 @@ public class ed03 {
         System.out.println("Total de letras: " + countLetters(n) + " | Total de letras em lowerCase = " + countLower(n) + " | Total de letras em UpperCase = " + countUpper(n));
         showLetters(n);
     }
+
+    public static int countNums(String n){
+        int count = 0;
+        for(int i = 0; i < n.length(); i++){
+            char c = n.charAt(i);
+            if(c >= '0' && c <= '9'){
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public static void showInvNum(String n) {
+        for (int i = n.length() - 1; i >= 0; i--) {
+            char c = n.charAt(i);
+            if (c >= '0' && c <= '9') {
+                System.out.println("Número: " + c + " na posição: " + (i + 1));
+            }
+        }
+    }
+
+    public static void ex0315(Scanner ler){
+        ler.nextLine();
+        System.out.println("Palavra = ");
+        String n = ler.nextLine();
+        System.out.println("Total de números: " + countNums(n));
+        System.out.println("Numeros começando do final para o começo da string");
+        showInvNum(n);
+
+    }
+    public static boolean isDigit(char c){
+        return c >= '0' && c <= '0';
+    }
+    public static boolean isLetter(char c){
+        return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
+    }
+
+    public static int countNonWD(String n){
+        int total = 0;
+        for(int i = 0; i < n.length(); i++){
+            char c = n.charAt(i);
+            if(!(isDigit(c) && !isLetter(c)) ){
+                total++;
+            }
+        }
+        return total;
+    }
+    public static void showNonWD(String n){
+        for(int i = 0; i < n.length(); i++) {
+            char c = n.charAt(i);
+            if (!(isDigit(c) && !isLetter(c))) {
+                System.out.println(c);
+            }
+        }
+    }
+
+    public static void ex0316(Scanner ler){
+        System.out.println("Palavra = ");
+        String n = ler.nextLine();
+        System.out.println("Total de palavras que não são letras e numeros: " + countNonWD(n));
+        showNonWD(n);
+    }
     public static void main(String[] args) {
         int opcao;
         do {
@@ -114,6 +176,12 @@ public class ed03 {
                     break;
                 case 4:
                     ex0314(ler);
+                    break;
+                case 5:
+                    ex0315(ler);
+                    break;
+                case 6:
+                    ex0316(ler);
                     break;
                 default:
                     System.out.print("\nERRO: OPCAO INVALIDA\n\n");
