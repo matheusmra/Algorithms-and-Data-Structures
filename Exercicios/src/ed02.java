@@ -128,6 +128,25 @@ public class ed02 {
                 System.out.println("O numero: " + x1 + " é maior que a metade de " + x2 + " ");
             }
     }
+
+    public static boolean isBetw(double n1, double n2, double n3){
+        if(n2 > n1 && n2 < n3){
+            return true;
+        }
+        return false;
+    }
+
+    public static void ex0219(Scanner ler){
+        System.out.println("Valor 1 = ");
+        double x1 = ler.nextDouble();
+        System.out.println("Valor 2 = ");
+        double x2 = ler.nextDouble();
+        System.out.println("Valor 3 = ");
+        double x3 = ler.nextDouble();
+        if(isBetw(x1,x2,x3)){
+            System.out.println("O valor: " + x2 + " esta entre os numeros: " + x1 + " e " + x3);
+        }
+    }
     public static void main(String[] args) {
         int opcao;
         do {
@@ -163,6 +182,9 @@ public class ed02 {
                     break;
                 case 8:
                     ex0218(ler);
+                    break;
+                case 9:
+                    ex0219(ler);
                     break;
                 default:
                     System.out.print("\nERRO: OPCAO INVALIDA\n\n");
