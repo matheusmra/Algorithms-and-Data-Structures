@@ -83,6 +83,51 @@ public class ed02 {
         }
     }
 
+    public static void ex0216(Scanner ler){
+        System.out.println("Valor 1 = ");
+        int x1 = ler.nextInt();
+        System.out.println("Valor 2 = ");
+        int x2 = ler.nextInt();
+        if(isPar(x1) && !(isPar(x2))){
+            System.out.println("O primeiro numero é par e o segundo é impar");
+        }
+    }
+
+    public static void ex0217(Scanner ler){
+        System.out.println("Valor 1 = ");
+        int x1 = ler.nextInt();
+        System.out.println("Valor 2 = ");
+        int x2 = ler.nextInt();
+        if(!(isPar(x1)) && x1 < 0 && isPar(x2) && x2 > 0){
+            System.out.println("O primeiro numero é impar e menor que 0 e o segundo numero é positivo e maior que 0");
+        }
+    }
+
+    public static int isHalf(double n1, double n2){
+        if(n1 < n2){
+            return 1;
+        }else if (n1 == n2){
+            return 2;
+        }else if (n1 > (n2/2)){
+            return 3;
+        }
+        return 0;
+    }
+
+    public static void ex0218(Scanner ler){
+            System.out.println("Valor 1 = ");
+            double x1 = ler.nextDouble();
+            System.out.println("Valor 2 = ");
+            double x2 = ler.nextDouble();
+            int resposta = isHalf(x1,x2);
+            if(resposta == 1){
+                System.out.println("O numero: " + x1 + " é menor que " + x2 + " ");
+            }else if (resposta == 2){
+                System.out.println("Os numeros são iguais");
+            }else if (resposta == 3){
+                System.out.println("O numero: " + x1 + " é maior que a metade de " + x2 + " ");
+            }
+    }
     public static void main(String[] args) {
         int opcao;
         do {
@@ -109,6 +154,15 @@ public class ed02 {
                     break;
                 case 5:
                     ex0215(ler);
+                    break;
+                case 6:
+                    ex0216(ler);
+                    break;
+                case 7:
+                    ex0217(ler);
+                    break;
+                case 8:
+                    ex0218(ler);
                     break;
                 default:
                     System.out.print("\nERRO: OPCAO INVALIDA\n\n");
