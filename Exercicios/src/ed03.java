@@ -11,7 +11,28 @@ public class ed03 {
     public static void ex0311(Scanner ler){
         String nome;
         ler.nextLine();
+        System.out.println("Palavra = ");
         nome = ler.nextLine();
+        showUpperLetters(nome);
+    }
+
+    public static int countUpper(String nome){
+        int count = 0;
+        for(int i = 0; i < nome.length(); i++){
+            char c = nome.charAt(i);
+            if(c >= 'A' && c <= 'Z'){
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public static void ex0312(Scanner ler){
+        ler.nextLine();
+        System.out.println("Palavra = ");
+        String nome = ler.nextLine();
+        int t = countUpper(nome);
+        System.out.println("Total de letras em Uppercase = " + t);
         showUpperLetters(nome);
     }
     public static void main(String[] args) {
@@ -28,6 +49,9 @@ public class ed03 {
                     break;
                 case 1:
                     ex0311(ler);
+                    break;
+                case 2:
+                    ex0312(ler);
                     break;
                 default:
                     System.out.print("\nERRO: OPCAO INVALIDA\n\n");
