@@ -122,7 +122,7 @@ public class ed03 {
 
     }
     public static boolean isDigit(char c){
-        return c >= '0' && c <= '0';
+        return c >= '0' && c <= '9';
     }
     public static boolean isLetter(char c){
         return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
@@ -132,7 +132,7 @@ public class ed03 {
         int total = 0;
         for(int i = 0; i < n.length(); i++){
             char c = n.charAt(i);
-            if(!(isDigit(c) && !isLetter(c)) ){
+            if(!isDigit(c) && !isLetter(c) ){
                 total++;
             }
         }
@@ -141,13 +141,14 @@ public class ed03 {
     public static void showNonWD(String n){
         for(int i = 0; i < n.length(); i++) {
             char c = n.charAt(i);
-            if (!(isDigit(c) && !isLetter(c))) {
+            if (!isDigit(c) && !isLetter(c)) {
                 System.out.println(c);
             }
         }
     }
 
     public static void ex0316(Scanner ler){
+        ler.nextLine();
         System.out.println("Palavra = ");
         String n = ler.nextLine();
         System.out.println("Total de palavras que não são letras e numeros: " + countNonWD(n));
