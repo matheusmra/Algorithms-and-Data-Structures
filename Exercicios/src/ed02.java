@@ -147,6 +147,39 @@ public class ed02 {
             System.out.println("O valor: " + x2 + " esta entre os numeros: " + x1 + " e " + x3);
         }
     }
+
+    public static void ex0220(Scanner ler){
+        System.out.println("Valor 1 = ");
+        double x1 = ler.nextDouble();
+        System.out.println("Valor 2 = ");
+        double x2 = ler.nextDouble();
+        System.out.println("Valor 3 = ");
+        double x3 = ler.nextDouble();
+        if(!(isBetw(x1,x2,x3))){
+            System.out.println("O segundo não está entre o primeiro e o último");
+        }
+    }
+
+    public static boolean charBtw(char c1, char c2, char c3){
+        if(c1 > c2 && c1 < c3){
+            return true;
+        }else if(c1 == c2 || c1 == c3){
+            return true;
+        }
+        return false;
+    }
+    public static void ex02E1(Scanner ler){
+        ler.nextLine();
+        System.out.println("Primeira letra = ");
+        char c1 = ler.nextLine().charAt(0);
+        System.out.println("Segunda Letra = ");
+        char c2 = ler.nextLine().charAt(0);
+        System.out.println("Terceira letra = ");
+        char c3 = ler.nextLine().charAt(0);
+        if(charBtw(c1,c2,c3)){
+            System.out.println("O primeiro valor lido está entre os outros dois, ou é igual a um deles.");
+        }
+    }
     public static void main(String[] args) {
         int opcao;
         do {
@@ -185,6 +218,12 @@ public class ed02 {
                     break;
                 case 9:
                     ex0219(ler);
+                    break;
+                case 10:
+                    ex0220(ler);
+                    break;
+                case 11:
+                    ex02E1(ler);
                     break;
                 default:
                     System.out.print("\nERRO: OPCAO INVALIDA\n\n");
