@@ -160,7 +160,7 @@ public class ed03 {
             if(array[i] %5 == 0 && array[i] > a && array[i] < b){
                 count++;
             }
-        }
+        } 
         return count;
     }
 
