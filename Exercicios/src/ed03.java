@@ -179,6 +179,7 @@ public class ed03 {
         }
                 System.out.println("Total de números que são multiplos de 5 e estão entre o intervalo " + a + " e " + b + ":" + countFive(array,a,b));
     }
+
     public static void main(String[] args) {
         int opcao;
         do {
