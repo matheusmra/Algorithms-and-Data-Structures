@@ -1,6 +1,6 @@
 public class bubblesort {
     public static void main(String[] args) {
-        int[] array = {1, 3, 2, 4, 7, 5, 6};
+        int[] array = {2, 3, 1, 4, 7, 5, 6};
 
         for (int i = 0; i < array.length - 1; i++) {
             for (int j = 0; j < array.length - 1 - i; j++) {
