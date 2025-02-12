@@ -11,7 +11,7 @@ public class ed02 {
         int x = ler.nextInt();
         if(x > 0) {
             if (isPar(x)) {
-                System.out.print("O numero: " + x + " é par!");
+                System.out.print("O numero: " + x + " eh par!");
             } else {
                 System.out.print("O numero é impar");
             }
