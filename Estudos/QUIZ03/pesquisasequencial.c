@@ -2,13 +2,14 @@
 #include <stdbool.h>
 
 bool PesquisaSequencial(int matriz[], int n){
+    bool resp = false;
     for(int i = 0; i < 10; i++){
         if(matriz[i] == n){
             i = n;
-            return true;
+            resp = true;
         }
     }
-    return false;
+    return resp;
 }
 
 int main(){
