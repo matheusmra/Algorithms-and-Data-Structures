@@ -1,4 +1,4 @@
-package Teste.src;
+
 import java.util.Scanner;
 
 public class fatorial {
