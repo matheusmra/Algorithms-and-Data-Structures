@@ -3,12 +3,15 @@
 
 bool PesquisaSequencial(int matriz[], int n){
     bool resp = false;
+    int count = 0;
     for(int i = 0; i < 10; i++){
+        count++;
         if(matriz[i] == n){
             i = n;
             resp = true;
         }
     }
+    printf("Quantidade de comparacoes = %d", count);
     return resp;
 }
 
