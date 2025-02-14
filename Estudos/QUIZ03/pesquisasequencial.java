@@ -2,13 +2,14 @@ package Estudos.QUIZ03;
 import java.util.Scanner;
 public class pesquisasequencial {
     public static boolean PesquisaSequencial(int[] vetor, int valor){
+        boolean resp = false;
         for(int i = 0; i < vetor.length; i++){
             if(vetor[i] == valor){
                 i = vetor.length;
-                return true;
+                resp = true;
             }
         }
-        return false;
+        return resp;
     }
 
     public static void main(String[] args){
