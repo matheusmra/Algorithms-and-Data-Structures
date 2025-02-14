@@ -3,12 +3,15 @@ import java.util.Scanner;
 public class pesquisasequencial {
     public static boolean PesquisaSequencial(int[] vetor, int valor){
         boolean resp = false;
+        int count = 0;
         for(int i = 0; i < vetor.length; i++){
+            count++;
             if(vetor[i] == valor){
                 i = vetor.length;
                 resp = true;
             }
         }
+        System.out.println("Quantidade de comparações = " + count);
         return resp;
     }
 
