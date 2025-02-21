@@ -32,7 +32,7 @@ public class is {
         for(int i = 0; i < size; i++){
             if(str.charAt(i) == 'a' || str.charAt(i) == 'e' || str.charAt(i) == 'i' || str.charAt(i) == 'o' || str.charAt(i) == 'u'){
                 return false;
-            }else if(str.charAt(i) == ',' || str.charAt(i) == '.'){
+            }else if(str.charAt(i) == ',' || str.charAt(i) == '.'){ // Retorna falso caso o caractere seja igual , ou . (Antes retornava true quando digitava um numero real)
                 return false;
             }
         }
@@ -81,7 +81,7 @@ public class is {
         System.out.println(x2(str.toLowerCase()));
         System.out.println(x3(str.toLowerCase()));
         System.out.println(x4(str.toLowerCase()));
-        
+        sc.close();
     }
     
 }
