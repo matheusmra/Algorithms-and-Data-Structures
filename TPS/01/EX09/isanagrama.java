@@ -32,13 +32,16 @@ public class isanagrama {
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        String str1 = sc.nextLine();
-        String str2 = sc.nextLine();
-        if (isanagram(str1, str2)) {
-            System.out.println("SIM");
-        } else {
-            System.out.println("NAO");
-        }
-        sc.close();
+        String str1;
+        String str2;
+        while (true) {
+            str1 = sc.next();
+            str2 = sc.next();
+            if (str1.equals("FIM")) {
+                break;
+            }
+        System.out.println(isanagram(str1,str2) ? "SIM" : "NÃO");
     }
+    sc.close();
+}
 }
