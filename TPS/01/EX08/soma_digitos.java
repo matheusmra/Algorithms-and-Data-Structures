@@ -13,17 +13,20 @@ public class soma_digitos{
      *  @param n - Numero que possui os digitos a serem somados
     */
     public static int somarDigitos(int n){
-        if (n == 0){
+        if (n == 0){ // Fim da recursão
             return 0;
         } else {
-            return n % 10 + somarDigitos(n / 10);
+            return n % 10 + somarDigitos(n / 10); 
         }
     }
     public static void main(String[] args){
         Scanner sc = new Scanner(System.in);
-        int n = sc.nextInt();
+        String str;
+        while (!(str = sc.next()).equals("FIM")) { // O Loop será sera encerrado quando digiat FIM
+        int n = Integer.parseInt(str); // Converte a string para inteiro;
         int soma = somarDigitos(n);
         System.out.println(soma);
+        }
         sc.close();
     }
 }
