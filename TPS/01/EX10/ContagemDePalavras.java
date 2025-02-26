@@ -32,9 +32,11 @@ public class ContagemDePalavras {
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        String str = sc.nextLine();
+        String str;
+        while(!(str = sc.nextLine()).equals("FIM")){
         int total = contarPalavras(str);
         System.out.println(total);
+        }
         sc.close();
     }
 }
