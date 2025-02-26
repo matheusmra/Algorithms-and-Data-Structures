@@ -14,9 +14,11 @@ public class string_invertida {
     }
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        String str = sc.nextLine();
+        String str;
+        while (!(str = sc.nextLine()).equals("FIM")) {
         String strInvertida = inverter(str);
         System.out.println(strInvertida);
+        }
         sc.close();
         }
     }
