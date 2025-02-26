@@ -14,8 +14,7 @@ public class validacaoSenha {
     public static boolean hasUpper(String str){
         int size = str.length();
         for(int i = 0; i < size; i++){
-            if(str.charAt(i) >= 'A' || str.charAt(i) <= 'Z'){
-                i = size;
+            if(str.charAt(i) >= 'A' && str.charAt(i) <= 'Z'){
                 return true;
             }
         }
@@ -30,8 +29,7 @@ public class validacaoSenha {
     public static boolean hasLower(String str){
         int size = str.length();
         for(int i = 0; i < size; i++){
-            if(str.charAt(i) >= 'a' || str.charAt(i) <= 'z'){
-                i = size;
+            if(str.charAt(i) >= 'a' && str.charAt(i) <= 'z'){
                 return true;
             }
         }
@@ -46,8 +44,7 @@ public class validacaoSenha {
     public static boolean hasDigit(String str){
         int size = str.length();
         for(int i = 0; i < size; i++){
-            if(str.charAt(i) >= '0' || str.charAt(i) <= '9'){
-                i = size;
+            if(str.charAt(i) >= '0' && str.charAt(i) <= '9'){
                 return true;
             }
         }
@@ -62,8 +59,10 @@ public class validacaoSenha {
     public static boolean hasEspecial(String str){
         int size = str.length();
         for(int i = 0; i < size; i++){
-            if(str.charAt(i) >= '!' || str.charAt(i) <= '/'){
-                i = size;
+            if((str.charAt(i) >= '!' && str.charAt(i) <= '/') || 
+               (str.charAt(i) >= ':' && str.charAt(i) <= '@') ||
+               (str.charAt(i) >= '[' && str.charAt(i) <= '`') ||
+               (str.charAt(i) >= '{' && str.charAt(i) <= '~')){
                 return true;
             }
         }
@@ -87,11 +86,10 @@ public class validacaoSenha {
 
     public static void main(String[] args){
         Scanner sc = new Scanner(System.in);
-        String str = sc.nextLine();
-        if(isGood(str)){
-            System.out.println("SIM");
+        String str;
+        while (!(str = sc.next()).equals("FIM")){
+        System.out.println(isGood(str) ? "SIM" : "NÃO");
         }
-            System.out.println("NAO");
         sc.close();
 
     }
