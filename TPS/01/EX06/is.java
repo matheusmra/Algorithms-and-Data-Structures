@@ -47,7 +47,7 @@ public class is {
     public static boolean x3(String str){
         int size = str.length(); // Tamanho da string
         for(int i = 0; i < size; i++){
-            if(str.charAt(i) < 48 || str.charAt(i) > 57){ // Verifica se o caracter[i] é menor que 0 (ASCII) ou maior que 9(ASCII)
+            if(str.charAt(i) < '0' || str.charAt(i) > '9'){ // Verifica se o caracter[i] é menor que 0 (ASCII) ou maior que 9(ASCII)
                 return false;
             }
         }
@@ -63,7 +63,7 @@ public class is {
         boolean ponto = false;
         int size = str.length();
         for (int i = 0; i < size; i++) {
-            if (str.charAt(i) == '.' || str.charAt(i) == ',') {
+            if (str.charAt(i) == '.' || str.charAt(i) == ',' && x3(str.toLowerCase())) {
                 if (ponto) {
                     return false;
                 }
@@ -76,12 +76,19 @@ public class is {
     }
     public static void main(String[] args){
         Scanner sc = new Scanner(System.in);
-        String str = sc.nextLine();
-        System.out.println(x1(str.toLowerCase()));
-        System.out.println(x2(str.toLowerCase()));
-        System.out.println(x3(str.toLowerCase()));
-        System.out.println(x4(str.toLowerCase()));
+        String str;
+        while (!(str = sc.nextLine()).equals("FIM")) {
+            System.out.println(
+                (x1(str.toLowerCase()) ? "SIM " : "NAO ") +
+                (x2(str.toLowerCase()) ? "SIM " : "NAO ") +
+                (x3(str.toLowerCase()) ? "SIM " : "NAO ") +
+                (x4(str.toLowerCase()) ? "SIM" : "NAO")
+            );
+            
+
+        }
         sc.close();
     }
     
+
 }
