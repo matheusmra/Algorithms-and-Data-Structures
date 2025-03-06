@@ -34,12 +34,8 @@ public class isanagrama {
         Scanner sc = new Scanner(System.in);
         String str1;
         String str2;
-        while (true) {
-            str1 = sc.next();
-            str2 = sc.next();
-            if (str1.equals("FIM")) {
-                break;
-            }
+        while (!(str1 = sc.nextLine()).equals("FIM")) {
+            str2 = sc.nextLine();
         System.out.println(isanagram(str1,str2) ? "SIM" : "NÃO");
     }
     sc.close();
