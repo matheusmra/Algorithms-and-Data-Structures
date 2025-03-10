@@ -32,7 +32,6 @@ void inverter(char str[], int inicio, int fim) {
 
 int main() {
     char str[TAM_MAX];
-    
     while (1) {
         // Lê a string
         scanf("%[^\n]", str);
