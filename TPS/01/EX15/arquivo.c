@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+    /**
+     * Função para realizar gravação de dados em um arquivo
+     * @param nomeArquivo - nome do arquivo no qual os dados serão gravados
+     * @param n - Inteiro que representa a quantidade de numeros que serão gravados
+     */
 void file_add(const char *nomeArquivo, int n) {
     FILE *arquivo = fopen(nomeArquivo, "wb");
     if (arquivo == NULL) {
@@ -16,7 +20,11 @@ void file_add(const char *nomeArquivo, int n) {
 
     fclose(arquivo);
 }
-
+    /**
+     * Função para realizar a leitura e exibição de dados em um arquivo
+     * @param nomeArquivo - nome do arquivo no qual os dados estão gravados
+     * @param n - Inteiro que representa a quantidade de numeros que serão exibidos
+     */
 void file_read(const char *nomeArquivo, int n) {
     FILE *arquivo = fopen(nomeArquivo, "rb");
     if (arquivo == NULL) {
@@ -31,7 +39,7 @@ void file_read(const char *nomeArquivo, int n) {
     // Realiza a leitura e imprime os números de trás para frente
     for (int i = 0; i < n && ptr >= 0; i++) {
         fseek(arquivo, ptr, SEEK_SET);  // Move o ponteiro para a posição desejada
-        double num;
+        double num = 0.0;
         fread(&num, sizeof(double), 1, arquivo);
         if (num == (int)num){
             printf("%d\n", (int)num);
@@ -44,7 +52,7 @@ void file_read(const char *nomeArquivo, int n) {
 }
 
 int main() {
-    int n;
+    int n = 0;
     scanf("%d", &n);
     // Grava os números no arquivo
     file_add("arquivo.bin", n);
