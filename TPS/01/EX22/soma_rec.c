@@ -26,7 +26,7 @@ int main()
     int n = 0;
     char string[TAM_MAX];
     while (scanf("%s", string) == 1 && strcmp(string, "FIM") != 0) {
-        int n = atoi(string);
+        int n = atoi(string); 
         printf("%d\n", soma_digitos(n));
     }
 
