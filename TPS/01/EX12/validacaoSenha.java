@@ -88,7 +88,7 @@ public class validacaoSenha {
         Scanner sc = new Scanner(System.in);
         String str;
         while (!(str = sc.next()).equals("FIM")){
-        System.out.println(isGood(str) ? "SIM" : "NÃO");
+        System.out.println(isGood(str) ? "SIM" : "NAO");
         }
         sc.close();
 
