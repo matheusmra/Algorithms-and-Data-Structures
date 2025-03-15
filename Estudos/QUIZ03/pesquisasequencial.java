@@ -1,4 +1,4 @@
-package Estudos.QUIZ03;
+
 import java.util.Scanner;
 public class pesquisasequencial {
     public static boolean PesquisaSequencial(int[] vetor, int valor){
