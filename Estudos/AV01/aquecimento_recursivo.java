@@ -4,7 +4,7 @@ public class aquecimento_recursivo {
         if(pos >= str.length()){
             return 0;
         }
-        int total = 0;
+        int total = 0; 
         if(str.charAt(pos) >= 'A' && str.charAt(pos) <= 'Z'){
             total++;
         }
