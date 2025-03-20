@@ -14,6 +14,11 @@ int contar_iterativo(char str[]){
 
 int main(){
     char str[TAM_MAX];
-    scanf("%[^\n]", str);
+    while(1){
+        scanf("%[^\n]", str);
+    if (strcmp(str, "FIM") == 0) {
+            break;
+    }
     printf("%d", contar_iterativo(str));
+    }
 }
