@@ -267,23 +267,15 @@ class Show {
      * @param caminho Caminho do CSV
      */
     public static Show[] csv(String caminho) throws Exception{
-
-        // Definir dados
         Show[] shows = new Show[1369];
         File file = new File(caminho);
-
         if(!file.exists()){
-           
             throw new FileNotFoundException("Arquivo não encontrado: " + caminho);
         }
-
         try(Scanner sc = new Scanner(file)){
-
             String data;
             int i = 0;
-            
             while(sc.hasNext()){
-
                 data = sc.nextLine();
                 shows[i++] = Create(data);
             }
