@@ -9,7 +9,7 @@
 
 typedef struct SHOW{
 
-    char showId[7];
+    char showId[7]; 
     char type[MAX];
     char title[MAX];
     char director[MAX];
