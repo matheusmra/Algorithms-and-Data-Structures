@@ -1,7 +1,7 @@
 import java.io.*;
 import java.util.*;
 
-class Show {
+class Show { 
 
     private String showId;
     private String type;
