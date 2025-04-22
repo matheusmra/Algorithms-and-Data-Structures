@@ -3,7 +3,7 @@
 #include<stdlib.h>
 #include<string.h>
 #include<stdbool.h>
-#define MAX 512
+#define MAX 512 
 #define MAX_CAST_LISTED 20
 #define MAX_PARTS 60
 
