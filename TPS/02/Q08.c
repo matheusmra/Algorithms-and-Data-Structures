@@ -834,9 +834,6 @@ void ShellSort(Show **array, int n)
     } while (h != 1);
 }
 
-
-//========================================================== Aplicação
-
 int main()
 {
 

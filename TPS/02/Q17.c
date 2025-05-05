@@ -535,20 +535,16 @@ int StrToInt(char *str)
  */
 Show Ler(const char *in)
 {
-
     // Definir dados
     Show show;
     int len = strlen(in);
     bool flag = true;
     int j = 0;
     char *simplify = (char *)malloc(2 * MAX * sizeof(char));
-
     if (!simplify)
         return show;
-
     for (int i = 0; i < len; i++)
     {
-
         char c = in[i];
 
         if (c == '"')
@@ -564,32 +560,24 @@ Show Ler(const char *in)
             simplify[j++] = c;
         }
     }
-
     simplify[j] = '\0';
-
     // Aplicando Array de Strings
     char **ArrayStrings = StrToArrayStringToken(simplify);
-
     setShowId(&show, ArrayStrings[0]);
     setType(&show, ArrayStrings[1]);
     setTitle(&show, ArrayStrings[2]);
     setDirector(&show, ArrayStrings[3]);
-
     // Caso especial
     char **CastMembers = StrToArrayStringVir(ArrayStrings[4]);
-
     setCastMembers(&show, CastMembers, ContVir(ArrayStrings[4]) + 1);
-
     setCountry(&show, ArrayStrings[5]);
     setDateAdded(&show, ArrayStrings[6]);
     setReleaseYear(&show, StrToInt(ArrayStrings[7]));
     setRating(&show, ArrayStrings[8]);
     setDuration(&show, ArrayStrings[9]);
-
     // Caso especial
     char **ListedIn = StrToArrayStringVir(ArrayStrings[10]);
     setListedIn(&show, ListedIn, ContVir(ArrayStrings[10]) + 1);
-
     return show;
 }
 
@@ -601,43 +589,33 @@ Show Ler(const char *in)
  */
 Show LerCsv(char *title)
 {
-
     // Definir dados
     Show resultado;
     FILE *csv = fopen("disneyplus.csv", "rt");
-
     if (!csv)
     {
-
         perror("Erro ao abrir o arquivo");
         return resultado;
     }
     else
     {
-
         char *lixo = malloc(2048 * sizeof(char));
         fgets(lixo, 2047, csv);
         free(lixo);
-
         for (int i = 0; i < 300; i++)
         {
-
             char *buffer = malloc(2048 * sizeof(char));
-
             if (fgets(buffer, 2047, csv) == NULL)
             {
-
                 free(buffer);
             }
             else if (strcmp(title, fgets(buffer, 2047, csv)) == 0)
             {
-
                 buffer[strcspn(buffer, "\n")] = '\0';
                 resultado = Ler(buffer);
                 free(buffer);
             }
         }
-
         fclose(csv);
         return resultado;
     }
@@ -650,35 +628,26 @@ Show LerCsv(char *title)
  */
 Show **LerCsvCompleto()
 {
-
     // Definir dados
     Show **resultado = calloc(1369, sizeof(Show *));
     FILE *csv = fopen("/tmp/disneyplus.csv", "rt");
-
     if (!csv)
     {
-
         perror("Erro ao abrir o arquivo");
         return NULL;
     }
-
     char *lixo = malloc(2048 * sizeof(char));
     fgets(lixo, 2047, csv);
     free(lixo);
-
     for (int i = 0; i < 1369; i++)
     {
-
         char *buffer = malloc(2048 * sizeof(char));
-
         if (fgets(buffer, 2047, csv) == NULL)
         {
-
             free(buffer);
         }
         else
         {
-
             buffer[strcspn(buffer, "\n")] = '\0';
             resultado[i] = malloc(sizeof(Show));
             *(resultado[i]) = Ler(buffer);
@@ -861,8 +830,6 @@ void heapSort(Show **arr, int n)
         heapify(arr, i, 0);
     }
 }
-
-//========================================================== Aplicação
 
 int main()
 {

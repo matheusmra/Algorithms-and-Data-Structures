@@ -907,8 +907,6 @@ void QuickSortShows(Show **arr, int esq, int dir)
         QuickSortShows(arr, i, dir);
 }
 
-//========================================================== Aplicação
-
 int main()
 {
 

@@ -849,8 +849,6 @@ void selectionSortRec(Show **arr, int inicio, int n) {
     selectionSortRec(arr, inicio + 1, n);
 }
 
-//========================================================== Aplicação
-
 int main()
 {
 

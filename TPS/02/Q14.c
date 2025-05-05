@@ -935,113 +935,81 @@ void RadixSort(Show **array, int n)
     }
 }
 
-//========================================================== Aplicação
 
 int main()
 {
-
     // Definir dados
     clock_t inicio = clock();
     Show **resultado = LerCsvCompleto();
     Show **ArrayShow = calloc(300, sizeof(Show *));
     int j = 0;
-
     if (resultado == NULL)
     {
-
         perror("Falha ao carregar os dados.\n");
         return 1;
     }
-
     // Entrada de dados 1
     char *input1 = malloc(1001 * sizeof(char));
     if (input1 == NULL)
     {
-
         perror("Erro ao alocar memória para input1 inicial");
         return 1;
     }
-
     // Uso do scanf limpando buffer com espaço até um \n ou 10 char´s
     scanf(" %10[^\n]", input1);
-
     while (strcmp(input1, "FIM") != 0)
     {
-
         for (int i = 0; i < 1369; i++)
         {
-
             if (strcmp(input1, getShowId(resultado[i])) == 0)
             {
-
                 ArrayShow[j++] = cloneShow(resultado[i]);
                 quickSort(0, ArrayShow[j - 1]->castCount - 1, ArrayShow[j - 1]->cast);
                 i = 1369;
             }
         }
-
         // Leitura de dados
         scanf(" %1000[^\n]", input1);
     }
-
     free(input1);
-
     // Ordenando para efetuar impressão
     selectionSortRec(ArrayShow, 0, j);
-
     // Ordenando para efetuar impressão
     RadixSort(ArrayShow, j);
-
     // Imprimir
     for (int i = 0; i < j; i++)
     {
-
         printar(ArrayShow[i]);
     }
-
     // Liberar memória
     for (int i = 0; i < 1369; i++)
     {
-
         if (resultado[i] != NULL)
         {
-
             free(resultado[i]);
         }
     }
-
     for (int i = 0; i < 300; i++)
     {
-
         if (ArrayShow[i] != NULL)
         {
-
             free(ArrayShow[i]);
         }
     }
-
     free(resultado);
     free(ArrayShow);
-
     clock_t fim = clock();
-
     // Tempo de execução calculado
     double tempo_execucao = (double)(fim - inicio);
-
     // Arquivo
     FILE *log = fopen("848813_bolha.txt", "w");
-
     if (log == NULL)
     {
-
         return 1;
     }
-
     fprintf(log, "848813\t");
     fprintf(log, "%d\t", comparacoes);
     fprintf(log, "%f\t", tempo_execucao);
-
     fclose(log);
-
     return 0;
 }
