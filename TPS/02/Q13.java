@@ -349,33 +349,94 @@ class Show {
         System.out.println(); 
     }
 }
-public class Q05 {
-    
-    // Função para realizar o Selection Sort
-    public static void selectionSort(Show[] vetor, int n, int comparacoes, int movimentacoes) {
-        for (int i = 0; i < n - 1; i++) {
-            int minIndex = i;
-            for (int j = i + 1; j < n; j++) {
-                comparacoes++; // Conta cada comparação
-                if (vetor[j].getTitle().compareTo(vetor[minIndex].getTitle()) < 0) {
-                    minIndex = j;
-                }
-            }
-            // Troca os elementos
-            Show temp = vetor[i];
-            vetor[i] = vetor[minIndex];
-            vetor[minIndex] = temp;
-            movimentacoes++; // Conta cada movimentação
+public class Q13 {
+    // Contadores de comparações e movimentações
+    public static int comp = 0;
+    public static int mov = 0;
+
+    /**
+     * Algoritmo Merge Sort para ordenar shows por duração,
+     * e em caso de empate, pelo título.
+     */
+    public static void mergeSort(Show[] array, int left, int right) {
+        if (left < right) {
+            int middle = (left + right) / 2;
+
+            // Ordena a metade esquerda
+            mergeSort(array, left, middle);
+
+            // Ordena a metade direita
+            mergeSort(array, middle + 1, right);
+
+            // Mescla as duas metades ordenadas
+            merge(array, left, middle, right);
         }
     }
+
+    /**
+     * Função auxiliar do Merge Sort para combinar duas metades ordenadas
+     */
+    public static void merge(Show[] array, int left, int middle, int right) {
+        int n1 = middle - left + 1;
+        int n2 = right - middle;
+
+        Show[] L = new Show[n1];
+        Show[] R = new Show[n2];
+
+        // Copia dados para os vetores temporários L[] e R[]
+        for (int i = 0; i < n1; ++i) {
+            L[i] = array[left + i];
+            mov++;
+        }
+        for (int j = 0; j < n2; ++j) {
+            R[j] = array[middle + 1 + j];
+            mov++;
+        }
+
+        int i = 0, j = 0;
+        int k = left;
+        // Combina os vetores L[] e R[] de volta no array original
+        while (i < n1 && j < n2) {
+            comp++;
+            boolean menor;
+            // Comparação pelo campo 'duration'
+            int durationComparison = L[i].getDuration().compareToIgnoreCase(R[j].getDuration());
+            if (durationComparison < 0) {
+                menor = true;
+            } else if (durationComparison > 0) {
+                menor = false;
+            } else {
+                // Empate: comparação pelo 'title'
+                comp++;
+                menor = L[i].getTitle().compareToIgnoreCase(R[j].getTitle()) <= 0;
+            }
+
+            // Coloca o menor no array original
+            array[k++] = menor ? L[i++] : R[j++];
+            mov++;
+        }
+
+        // Copia os elementos restantes de L[]
+        while (i < n1) {
+            array[k++] = L[i++];
+            mov++;
+        }
+
+        // Copia os elementos restantes de R[]
+        while (j < n2) {
+            array[k++] = R[j++];
+            mov++;
+        }
+    }
+
     public static void main(String[] args) throws Exception {
         Locale.setDefault(Locale.US);
-        MyIO.setCharset("ISO-8859-1");
+        MyIO.setCharset("UTF-8");
+
+        // Lê todos os shows do CSV
         Show[] base = Show.csv("/tmp/disneyplus.csv");
         Show[] vetor = new Show[1400];
         int n = 0;
-
-        // Inserção dos shows pelo ID
         String entrada = MyIO.readLine();
         while (!entrada.equals("FIM")) {
             for (Show s : base) {
@@ -387,23 +448,20 @@ public class Q05 {
             entrada = MyIO.readLine();
         }
 
-        // Variáveis para contagem de comparações e movimentações
-        int comparacoes = 0;
-        int movimentacoes = 0;
+        // Ordena vetor com Merge Sort e cronometra tempo
         long inicio = System.nanoTime();
-        // Ordenação por Selection Sort
-        selectionSort(vetor, n, comparacoes, movimentacoes);
-        // Imprimir os shows ordenados
+        mergeSort(vetor, 0, n - 1);
+        long fim = System.nanoTime();
+        double tempo = (fim - inicio) / 1e6;
+
+        // Imprime os resultados ordenados
         for (int i = 0; i < n; i++) {
             vetor[i].Imprimir();
         }
-        // Geração do log
-        long fim = System.nanoTime();
-        double tempo = (fim - inicio) / 1e6;
-        String matricula = "848813";
-        FileWriter log = new FileWriter(new File("matricula_selecao.txt"));
-        log.write(matricula + "\t" + comparacoes + "\t" + movimentacoes + "\t" + tempo);
-        log.close();
+
+        // Gera log com número de comparações, movimentações e tempo
+        FileWriter fw = new FileWriter("matricula_mergesort.txt");
+        fw.write("848813\t" + comp + "\t" + mov + "\t" + tempo);
+        fw.close();
     }
 }
-

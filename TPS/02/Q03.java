@@ -370,7 +370,6 @@ public class Q03 {
             }
             entrada = MyIO.readLine();
         }
-
         // Selection Sort buscando pelo titulo
         int comparacoes = 0;
         long inicio = System.nanoTime();

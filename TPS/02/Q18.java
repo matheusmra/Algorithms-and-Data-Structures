@@ -1,8 +1,10 @@
 import java.io.*;
 import java.util.*;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
 
 class Show { 
-
+    public static int comp = 0;
     private String showId;
     private String type;
     private String title;
@@ -195,13 +197,7 @@ class Show {
 
         return data;
     }
-
-    /**
-     * Leitura de dados da entrada e atribuições
-     * 
-     * @param in Entrada de dados
-     */
-    public void Ler(String in) throws Exception{
+    public void Ler(String in) throws Exception {
 
         // Definir dados
         String simplify = "";
@@ -209,7 +205,7 @@ class Show {
         int len = in.length();
 
         // Varrer String para verificar se está entre aspas
-        for(int i = 0; i < len; i++){
+        for (int i = 0; i < len; i++) {
 
             char c = in.charAt(i);
             if (c == '"')
@@ -222,6 +218,7 @@ class Show {
 
         // Array de Strings simplificado
         String[] ShowStr = simplify.split("\\|");
+
         // Settando valores
         setShowId(ShowStr[0]);
         setType(ShowStr[1]);
@@ -230,9 +227,8 @@ class Show {
 
         // Ajuste na formatação
         String[] CastAux = ShowStr[4].split(",\\s*");
-        int castl = CastAux.length;
-        quickSort(0, castl - 1, CastAux);
         setCast(CastAux);
+
         setCountry(ShowStr[5]);
         setDateAdded(ShowStr[6]);
 
@@ -243,8 +239,6 @@ class Show {
 
         // Ajuste na formatação
         String[] ListedInAux = ShowStr[10].split(",\\s*");
-        int ListedLen = ListedInAux.length;
-        quickSort(0, ListedLen - 1, ListedInAux);
         setListedIn(ListedInAux);
 
     }
@@ -255,42 +249,127 @@ class Show {
      * @param in String de entrada
      * @return Show criado
      */
-    public static Show Create(String in) throws Exception{
+    public static Show Create(String in) throws Exception {
+
+        // Definir dados
         Show created = new Show();
+
+        // Leitura
         created.Ler(in);
         return created;
+    }
+
+    /**
+     * Função para transformar id como String
+     * 
+     * @param data
+     * @return
+     */
+    public static String IdString(String data) {
+
+        // Definir dados
+        String result = "";
+        int i = 0;
+
+        while (data.charAt(i) != ',') {
+
+            result += data.charAt(i);
+            i++;
+        }
+
+        return result;
     }
 
     /**
      * Leitura do arquivo CSV
      * 
      * @param caminho Caminho do CSV
+     * @param id      String de entrada
      */
-    public static Show[] csv(String caminho) throws Exception{
-        Show[] shows = new Show[1369];
+    public static Show AddVetor(String caminho, String id) throws Exception {
+
+        // Definir dados
+        Show show = null;
         File file = new File(caminho);
-        if(!file.exists()){
+
+        if (!file.exists()) {
+
             throw new FileNotFoundException("Arquivo não encontrado: " + caminho);
         }
-        try(Scanner sc = new Scanner(file)){
+
+        try (Scanner sc = new Scanner(file)) {
+
+            // Definir dados
             String data;
-            int i = 0;
-            while(sc.hasNext()){
+
+            // Verificar linhas
+            while (sc.hasNext()) {
+
+                // Criar show caso seja igual ao id
                 data = sc.nextLine();
-                shows[i++] = Create(data);
+                if (IdString(data).equals(id)) {
+
+                    show = Create(data);
+                    quickSort(0, show.getCast().length - 1, show.getCast());
+                }
+
             }
         }
-        return shows;
+
+        return show;
+    }
+
+    public void Imprimir() {
+
+        System.out.print("=> ");
+        System.out.print(showId + " ## ");
+        System.out.print(title + " ## ");
+        System.out.print(type + " ## ");
+        System.out.print(director + " ## ");
+
+        System.out.print("[");
+
+        // Elenco
+        for (int i = 0; i < cast.length; i++) {
+
+            if (i == cast.length - 1)
+                System.out.print(cast[i]);
+            else
+                System.out.print(cast[i] + ", ");
+        }
+
+        System.out.print("]");
+
+        System.out.print(" ## ");
+
+        System.out.print(country + " ## ");
+        System.out.print(dateAdded + " ## ");
+        System.out.print(releaseYear + " ## ");
+        System.out.print(rating + " ## ");
+        System.out.print(duration + " ## ");
+
+        System.out.print("[");
+
+        // Categorias
+        for (int i = 0; i < listedIn.length; i++) {
+
+            if (i == listedIn.length - 1)
+                System.out.print(listedIn[i]);
+            else
+                System.out.print(listedIn[i] + ", ");
+        }
+
+        System.out.print("] ##");
     }
 
     /**
-     * Função para trocar dois elementos do array
+     * Realiza a troca de posição de alguns elementos
      * 
      * @param i     Índice do primeiro elemento
      * @param j     Índice do segundo elemento
-     * @param array Array de Strings 
+     * @param array Array de Strings a ser ordenado
      */
-    public static void swap(int i, int j, String[] array){
+    public static void swap(int i, int j, String[] array) {
 
         String temp = array[i];
         array[i] = array[j];
@@ -305,105 +384,121 @@ class Show {
      * @param array Array de Strings a ser ordenado
      */
     public static void quickSort(int esq, int dir, String[] array) {
-        if (array == null || array.length == 0 || esq >= dir)
-            return;
+
+        // Define índices e pivô no meio
         int i = esq, j = dir;
-        String pivo = array[esq + (dir - esq) / 2]; 
+        String pivo = array[(esq + dir) / 2];
+
+        // Varredura
         while (i <= j) {
-            while (array[i].compareTo(pivo) < 0) i++;
-            while (array[j].compareTo(pivo) > 0) j--;
+
+            // Define posição das Strings menores e maiores que o pivô
+            while (array[i].compareTo(pivo) < 0)
+                i++;
+            while (array[j].compareTo(pivo) > 0)
+                j--;
+
+            // Troca elementos para que menores fiquem antes do pivô
+            // Troca elementos para que maiores fiquem depois do pivô
             if (i <= j) {
                 swap(i, j, array);
                 i++;
                 j--;
             }
         }
-        // Chamada recursiva
-        if (esq < j) quickSort(esq, j, array);
-        if (i < dir) quickSort(i, dir, array);
-    }
-    
 
-    public void Imprimir() {
-
-        System.out.print("=> ");
-        System.out.print(showId + " ## ");
-        System.out.print(title + " ## ");
-        System.out.print(type + " ## ");
-        System.out.print(director + " ## ");
-        System.out.print("[");
-        if(cast != null && cast.length > 0)
-            System.out.print(String.join(", ", cast));
-        System.out.print("]");
-        System.out.print(" ## ");
-        System.out.print(country + " ## ");
-        System.out.print(dateAdded + " ## ");
-        System.out.print(releaseYear + " ## ");
-        System.out.print(rating + " ## ");
-        System.out.print(duration + " ## ");
-        System.out.print("[");
-        // Categorias
-        if(listedIn != null && listedIn.length > 0)
-            System.out.print(String.join(", ", listedIn));
-        System.out.print("] ## ");
-        System.out.println(); 
+        // Chamada recursiva para parte da esquerda e da direita
+        if (esq < j)
+            quickSort(esq, j, array);
+        if (i < dir)
+            quickSort(i, dir, array);
     }
-}
-public class Q05 {
-    
-    // Função para realizar o Selection Sort
-    public static void selectionSort(Show[] vetor, int n, int comparacoes, int movimentacoes) {
-        for (int i = 0; i < n - 1; i++) {
-            int minIndex = i;
-            for (int j = i + 1; j < n; j++) {
-                comparacoes++; // Conta cada comparação
-                if (vetor[j].getTitle().compareTo(vetor[minIndex].getTitle()) < 0) {
-                    minIndex = j;
-                }
-            }
-            // Troca os elementos
-            Show temp = vetor[i];
-            vetor[i] = vetor[minIndex];
-            vetor[minIndex] = temp;
-            movimentacoes++; // Conta cada movimentação
+
+    private Date getParsedDate() {
+
+        if (dateAdded == null || dateAdded.isEmpty()) {
+            return new Date(0);
+        }
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("MMMM d, yyyy", Locale.US);
+            return sdf.parse(dateAdded);
+        } catch (ParseException e) {
+            System.err.println("Erro ao parsear data: " + dateAdded);
+            return new Date(0);
         }
     }
+
+    // Método para comparar este show com outro
+    public int compareTo(Show other) {
+
+        // Compara as datas primeiro
+        int dateComparison = this.getParsedDate().compareTo(other.getParsedDate());
+        if (dateComparison != 0) {
+            return dateComparison;
+        }
+        // Se as datas forem iguais, compara os títulos
+        return this.title.compareTo(other.title);
+    }
+
+    // Método auxiliar para trocar dois elementos no array
+    private static void swap(Show[] array, int i, int j) {
+        Show temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+
+    // Quicksort adaptado para Show[]
+    public static void QuickSortShow(Show[] array, int esq, int dir) {
+        int i = esq, j = dir;
+        Show pivo = array[(dir + esq) / 2];
+
+        while (i <= j) {
+            while (array[i].compareTo(pivo) < 0)
+                i++;
+            while (array[j].compareTo(pivo) > 0)
+                j--;
+
+            if (i <= j) {
+                swap(array, i, j);
+                i++;
+                j--;
+            }
+        }
+
+        // Chamadas recursivas
+        if (esq < j)
+            QuickSortShow(array, esq, j);
+        if (i < dir)
+            QuickSortShow(array, i, dir);
+    }
+}
+
+public class Q18 {
+
     public static void main(String[] args) throws Exception {
-        Locale.setDefault(Locale.US);
-        MyIO.setCharset("ISO-8859-1");
-        Show[] base = Show.csv("/tmp/disneyplus.csv");
-        Show[] vetor = new Show[1400];
-        int n = 0;
-
-        // Inserção dos shows pelo ID
-        String entrada = MyIO.readLine();
-        while (!entrada.equals("FIM")) {
-            for (Show s : base) {
-                if (s.getShowId().equals(entrada)) {
-                    vetor[n++] = s;
-                    break;
-                }
-            }
-            entrada = MyIO.readLine();
-        }
-
-        // Variáveis para contagem de comparações e movimentações
-        int comparacoes = 0;
-        int movimentacoes = 0;
+        // Definir dados
         long inicio = System.nanoTime();
-        // Ordenação por Selection Sort
-        selectionSort(vetor, n, comparacoes, movimentacoes);
-        // Imprimir os shows ordenados
-        for (int i = 0; i < n; i++) {
-            vetor[i].Imprimir();
+        Show[] shows = new Show[300];
+        String entrada1;
+        int i = 0;
+        // Leitura dos dados
+        entrada1 = MyIO.readLine();
+        while (!entrada1.equals("FIM")) {
+            shows[i] = Show.AddVetor("/tmp/disneyplus.csv", entrada1);
+            i++;
+            entrada1 = MyIO.readLine();
         }
-        // Geração do log
+
+        // Ordenação
+        Show.QuickSortShow(shows, 0, 299);
+        for (int j = 0; j < 10; j++) {
+            shows[j].Imprimir();
+            System.out.println();
+        }
         long fim = System.nanoTime();
-        double tempo = (fim - inicio) / 1e6;
-        String matricula = "848813";
-        FileWriter log = new FileWriter(new File("matricula_selecao.txt"));
-        log.write(matricula + "\t" + comparacoes + "\t" + movimentacoes + "\t" + tempo);
-        log.close();
+        double tempoMs = (fim - inicio) / 1_000_000.0;
+        try (PrintWriter writer = new PrintWriter(new FileWriter("848813_quicksort.txt"))) {
+            writer.printf("848813\t%d\t%.2f\n", Show.comp, tempoMs);
+        }
     }
 }
-
