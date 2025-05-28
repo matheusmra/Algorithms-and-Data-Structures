@@ -352,25 +352,25 @@ public static ArrayList<Show> csv(String caminho) throws Exception {
 
 
 // Classe principal
-public class Q01 {
+public class Q10 {
     public static void main(String[] args) throws Exception {
-        Show showManager = new Show();
+    Show showManager = new Show();
         ListaFlex lista = new ListaFlex();
         ArrayList<Show> removidos = new ArrayList<>();
-
+        
         ArrayList<Show> shows = showManager.csv("/tmp/disneyplus.csv");
+
+        
 
         if (shows.isEmpty()) {
             System.out.println("Nenhum show encontrado.");
             return;
         }
-
         Scanner sc = new Scanner(System.in);
 
-        // Leitura inicial dos IDs a serem inseridos na lista
         String input = " ";
-        while (!(input = sc.nextLine()).equals("FIM")) {
-            String id = input.trim();
+        while(!(input=sc.nextLine()).equals("FIM")) {
+        String id = input.trim();
             for (Show p : shows) {
                 if (id.equals(p.getShowId())) {
                     lista.inserirFim(p);
@@ -378,83 +378,8 @@ public class Q01 {
                 }
             }
         }
-
-        int tam = sc.nextInt();
-        sc.nextLine(); // consumir quebra de linha após o número
-
-        for (int i = 0; i < tam; i++) {
-            String comando = sc.next();
-
-            int pos;
-            String id;
-            Show show;
-
-            switch (comando) {
-                case "II":
-                    if (sc.hasNext()) {
-                        id = sc.next();
-                        show = searchShowId(shows, id);
-                        if (show != null) {
-                            lista.inserirInicio(show);
-                        }
-                    }
-                    break;
-
-                case "IF":
-                    if (sc.hasNext()) {
-                        id = sc.next();
-                        show = searchShowId(shows, id);
-                        if (show != null) {
-                            lista.inserirFim(show);
-                        }
-                    }
-                    break;
-
-                case "I*":
-                    if (sc.hasNextInt()) {
-                        pos = sc.nextInt();
-                        if (sc.hasNext()) {
-                            id = sc.next();
-                            show = searchShowId(shows, id);
-                            if (show != null) {
-                                lista.inserir(show, pos);
-                            }
-                        }
-                    }
-                    break;
-
-                case "RI":
-                    Show showRemovedInicio = lista.removerInicio();
-                    if (showRemovedInicio != null) {
-                        removidos.add(showRemovedInicio);
-                    }
-                    break;
-
-                case "RF":
-                    Show showRemovedFim = lista.removerFim();
-                    if (showRemovedFim != null) {
-                        removidos.add(showRemovedFim);
-                    }
-                    break;
-
-                case "R*":
-                    if (sc.hasNextInt()) {
-                        pos = sc.nextInt();
-                        Show showRemovedPos = lista.remover(pos);
-                        if (showRemovedPos != null) {
-                            removidos.add(showRemovedPos);
-                        }
-                    }
-                    break;
-            }
-        }
-
-        for (Show p : removidos) {
-            System.out.println("(R) " + p.getTitle());
-        }
-
+        lista.ordenar();
         lista.mostrar();
-        sc.close();
     }
 
     public static Show searchShowId(ArrayList<Show> shows, String id) {
@@ -470,7 +395,7 @@ public class Q01 {
 
 class Celula {
     Show show;
-    Celula prox;
+    Celula ant,prox;
 
     Celula() {
         this.show = null;
@@ -479,7 +404,7 @@ class Celula {
 
     Celula(Show x) {
         this.show = x;
-        this.prox = null;
+        this.prox = this.ant = null;
     }
 }
 
@@ -493,15 +418,19 @@ class ListaFlex {
 
     void inserirFim(Show x) {
         ultimo.prox = new Celula(x);
+        ultimo.prox.ant = ultimo;
         ultimo = ultimo.prox;
     }
 
     void inserirInicio(Show x) {
         Celula temp = new Celula(x);
         temp.prox = primeiro.prox;
+        temp.ant = primeiro;
         primeiro.prox = temp;
         if (primeiro.prox == ultimo) {
             ultimo = temp;
+        } else {
+            temp.prox.ant = temp;
         }
         temp = null;
     }
@@ -510,32 +439,34 @@ class ListaFlex {
         if (primeiro == ultimo) {
             System.exit(0);
         }
-        Celula i;
-        for (i = primeiro; i.prox != ultimo; i = i.prox)
-            ;
-        Show show = ultimo.show;
-        ultimo = i;
-        i = ultimo.prox = null;
-        return show;
+        Show elemento = ultimo.show;
+        Celula temp = ultimo.ant;
+        temp.prox = ultimo.prox;
+        ultimo.ant = null;
+        ultimo = temp;
+        temp = null;
+        return elemento;
     }
 
     Show removerInicio() { 
         if (primeiro == ultimo) {
             System.exit(0);
         }
-        Celula temp = primeiro;
-        primeiro = primeiro.prox;
-        Show show = primeiro.show;
-        temp.prox = null;
+        Celula temp = primeiro.prox;
+        Show elemento = temp.show;
+        primeiro.prox = temp.prox;
+        temp.prox.ant = primeiro;
+        temp.ant = temp.prox = null;
         temp = null;
-        return show;
+        return elemento;
     }
 
-    void inserir(Show x, int pos) {
+    void inserir(Show x, int pos) throws Exception {
         int tam = tamanho();
-        if (pos < 0 || pos > tam) {
-            System.exit(0);
-        } else if (pos == 0) {
+        if (pos > tam || pos < 0) {
+            throw new Exception("POSICAO INVALIDA");
+        }
+        if (pos == 0) {
             inserirInicio(x);
         } else if (pos == tam) {
             inserirFim(x);
@@ -544,32 +475,35 @@ class ListaFlex {
             for (int j = 0; j < pos; j++, i = i.prox)
                 ;
             Celula temp = new Celula(x);
+            temp.ant = i;
             temp.prox = i.prox;
+            i.prox.ant = temp;
             i.prox = temp;
-            temp = i = null;
+            temp = null;
         }
     }
 
     Show remover(int pos) {
-        Show show = null;
         int tam = tamanho();
-        if (primeiro == ultimo || pos < 0 || pos >= tam) {
+        if (pos > tam || pos < 0) {
             System.exit(0);
-        } else if (pos == 0) {
-            show = removerInicio();
+        }
+        Show elemento;
+        if (pos == 0) {
+            elemento = removerInicio();
         } else if (pos == tam - 1) {
-            show = removerFim();
+            elemento = removerFim();
         } else {
             Celula i = primeiro;
-            for (int j = 0; j < pos; j++, i = i.prox)
-                ;
+            for (int j = 0; j < pos; j++, i = i.prox);
             Celula temp = i.prox;
-            show = temp.show;
+            elemento = temp.show;
             i.prox = temp.prox;
-            temp.prox = null;
-            i = temp = null;
+            temp.prox.ant = i;
+            temp.ant = temp.prox = null;
+            temp = null;
         }
-        return show;
+        return elemento;
     }
 
     void mostrar() {
@@ -580,9 +514,43 @@ class ListaFlex {
 
     int tamanho() {
         int tam = 0;
-        for (Celula i = primeiro; i != ultimo; i = i.prox, tam++)
-            ;
+        for (Celula i = primeiro; i != ultimo; i = i.prox, tam++);
         return tam;
     }
-}
 
+    void ordenar() {
+        quickSort(primeiro.prox, ultimo);
+    }
+
+    private void quickSort(Celula low, Celula high) {
+        if (high != null && low != high && low != high.prox) {
+            Celula pivo = partition(low, high);
+            quickSort(low, pivo.ant);
+            quickSort(pivo.prox, high);
+        }
+    }
+
+    private Celula partition(Celula low, Celula high) {
+        Show pivo = high.show;
+        Celula i = low.ant; // Inicializa a posição de menor elemento
+
+        for (Celula j = low; j != high; j = j.prox) {
+            if (j.show.getDateAdded().compareTo(pivo.getDateAdded()) < 0 || 
+                (j.show.getDateAdded() == pivo.getDateAdded() && 
+                j.show.getTitle().compareTo(pivo.getTitle()) <= 0)) {
+                
+                i = (i == null) ? low : i.prox; // Incrementa i
+                swap(i, j);
+            }
+        }
+        i = (i == null) ? low : i.prox; // Incrementa i
+        swap(i, high); // Coloca o pivô na posição correta
+        return i;
+    }
+
+    private void swap(Celula a, Celula b) {
+        Show temp = a.show;
+        a.show = b.show;
+        b.show = temp;
+    }
+}

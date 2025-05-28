@@ -352,109 +352,64 @@ public static ArrayList<Show> csv(String caminho) throws Exception {
 
 
 // Classe principal
-public class Q01 {
+public class Q09 {
     public static void main(String[] args) throws Exception {
-        Show showManager = new Show();
+    Show showManager = new Show();
         ListaFlex lista = new ListaFlex();
         ArrayList<Show> removidos = new ArrayList<>();
-
+        
         ArrayList<Show> shows = showManager.csv("/tmp/disneyplus.csv");
+
+        
 
         if (shows.isEmpty()) {
             System.out.println("Nenhum show encontrado.");
             return;
         }
-
         Scanner sc = new Scanner(System.in);
 
-        // Leitura inicial dos IDs a serem inseridos na lista
         String input = " ";
-        while (!(input = sc.nextLine()).equals("FIM")) {
-            String id = input.trim();
+        while(!(input=sc.nextLine()).equals("FIM")) {
+        String id = input.trim();
             for (Show p : shows) {
                 if (id.equals(p.getShowId())) {
-                    lista.inserirFim(p);
+                    lista.inserirInicio(p);
                     break;
                 }
             }
         }
-
-        int tam = sc.nextInt();
-        sc.nextLine(); // consumir quebra de linha após o número
-
-        for (int i = 0; i < tam; i++) {
+        
+        int tam = sc.nextInt(); 
+        
+        for(int i = 0; i < tam; i++) {
             String comando = sc.next();
-
-            int pos;
             String id;
             Show show;
 
             switch (comando) {
-                case "II":
-                    if (sc.hasNext()) {
-                        id = sc.next();
-                        show = searchShowId(shows, id);
-                        if (show != null) {
-                            lista.inserirInicio(show);
-                        }
-                    }
-                    break;
+                case "I":
+                id = sc.next();
+                show = searchShowId(shows, id);
+                if (show != null) {
+                lista.inserirInicio(show);
+                }
+                break;
 
-                case "IF":
-                    if (sc.hasNext()) {
-                        id = sc.next();
-                        show = searchShowId(shows, id);
-                        if (show != null) {
-                            lista.inserirFim(show);
-                        }
-                    }
-                    break;
 
-                case "I*":
-                    if (sc.hasNextInt()) {
-                        pos = sc.nextInt();
-                        if (sc.hasNext()) {
-                            id = sc.next();
-                            show = searchShowId(shows, id);
-                            if (show != null) {
-                                lista.inserir(show, pos);
-                            }
-                        }
-                    }
-                    break;
-
-                case "RI":
+                case "R":
                     Show showRemovedInicio = lista.removerInicio();
                     if (showRemovedInicio != null) {
                         removidos.add(showRemovedInicio);
                     }
                     break;
-
-                case "RF":
-                    Show showRemovedFim = lista.removerFim();
-                    if (showRemovedFim != null) {
-                        removidos.add(showRemovedFim);
-                    }
-                    break;
-
-                case "R*":
-                    if (sc.hasNextInt()) {
-                        pos = sc.nextInt();
-                        Show showRemovedPos = lista.remover(pos);
-                        if (showRemovedPos != null) {
-                            removidos.add(showRemovedPos);
-                        }
-                    }
-                    break;
             }
         }
 
-        for (Show p : removidos) {
+        for(Show p : removidos) {
             System.out.println("(R) " + p.getTitle());
         }
 
         lista.mostrar();
-        sc.close();
     }
 
     public static Show searchShowId(ArrayList<Show> shows, String id) {
@@ -491,10 +446,6 @@ class ListaFlex {
         primeiro = ultimo = new Celula();
     }
 
-    void inserirFim(Show x) {
-        ultimo.prox = new Celula(x);
-        ultimo = ultimo.prox;
-    }
 
     void inserirInicio(Show x) {
         Celula temp = new Celula(x);
@@ -506,77 +457,30 @@ class ListaFlex {
         temp = null;
     }
 
-    Show removerFim() {
-        if (primeiro == ultimo) {
-            System.exit(0);
-        }
-        Celula i;
-        for (i = primeiro; i.prox != ultimo; i = i.prox)
-            ;
-        Show show = ultimo.show;
-        ultimo = i;
-        i = ultimo.prox = null;
-        return show;
-    }
-
     Show removerInicio() { 
-        if (primeiro == ultimo) {
-            System.exit(0);
+        if (primeiro.prox == null) { 
+            return null; 
         }
-        Celula temp = primeiro;
-        primeiro = primeiro.prox;
-        Show show = primeiro.show;
-        temp.prox = null;
-        temp = null;
-        return show;
-    }
-
-    void inserir(Show x, int pos) {
-        int tam = tamanho();
-        if (pos < 0 || pos > tam) {
-            System.exit(0);
-        } else if (pos == 0) {
-            inserirInicio(x);
-        } else if (pos == tam) {
-            inserirFim(x);
-        } else {
-            Celula i = primeiro;
-            for (int j = 0; j < pos; j++, i = i.prox)
-                ;
-            Celula temp = new Celula(x);
-            temp.prox = i.prox;
-            i.prox = temp;
-            temp = i = null;
-        }
-    }
-
-    Show remover(int pos) {
-        Show show = null;
-        int tam = tamanho();
-        if (primeiro == ultimo || pos < 0 || pos >= tam) {
-            System.exit(0);
-        } else if (pos == 0) {
-            show = removerInicio();
-        } else if (pos == tam - 1) {
-            show = removerFim();
-        } else {
-            Celula i = primeiro;
-            for (int j = 0; j < pos; j++, i = i.prox)
-                ;
-            Celula temp = i.prox;
-            show = temp.show;
-            i.prox = temp.prox;
-            temp.prox = null;
-            i = temp = null;
-        }
-        return show;
+        Celula temp = primeiro.prox;
+        primeiro.prox = primeiro.prox.prox; 
+        Show show = temp.show;
+        temp.prox = null; 
+        return show; 
     }
 
     void mostrar() {
-        for (Celula i = primeiro.prox; i != null; i = i.prox) {
-            i.show.Imprimir();
+    mostrarRecursivo(primeiro.prox, 45);
+    }
+    
+    private void mostrarRecursivo(Celula celula, int x) {
+    if (celula != null) {
+        System.out.print("[" + x + "] ");
+        celula.show.Imprimir();
+        mostrarRecursivo(celula.prox, x - 1);
         }
     }
+
+    
 
     int tamanho() {
         int tam = 0;
@@ -585,4 +489,5 @@ class ListaFlex {
         return tam;
     }
 }
+
 
