@@ -202,20 +202,6 @@ public class Matriz {
         return temp;
     }
 
-    public void drawMatrix() {
-        Celula i = inicio;
-        Celula j = inicio;
-        for (int a = 0; a < linha; a++) {
-            for (int b = 0; b < coluna; b++) {
-                System.out.print(j.elemento + " ");
-                j = j.dir;
-            }
-            System.out.println();
-            i = i.inf;
-            j = i;
-        }
-    }
-
     public int get(int i, int j) {
         Celula temp = getPosition(i, j);
         return temp.elemento;
