@@ -572,8 +572,6 @@ int main() {
 
     FilaCircular fila;
     criarFila(&fila);
-
-    // Entrada de dados iniciais (primeira parte)
     char input[1001];
     scanf(" %1000[^\n]", input);
     while(strcmp(input, "FIM") != 0){
@@ -588,8 +586,6 @@ int main() {
         }
         scanf(" %1000[^\n]", input);
     }
-
-    // Segunda parte: comandos
     int n;
     scanf("%d", &n);
     for(int i = 0; i < n; i++){

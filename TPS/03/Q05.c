@@ -627,8 +627,6 @@ int main() {
 
     Lista lista;
     criarLista(&lista);
-
-    // Entrada de dados iniciais (primeira parte)
     char input[1001];
     scanf(" %1000[^\n]", input);
     while(strcmp(input, "FIM") != 0){
@@ -642,8 +640,6 @@ int main() {
         }
         scanf(" %1000[^\n]", input);
     }
-
-    // Segunda parte: comandos
     int n;
     scanf("%d", &n);
     for(int i = 0; i < n; i++){
@@ -705,7 +701,6 @@ int main() {
 
     // Mostrar elementos restantes na lista
     mostrar(&lista);
-
     // Liberar memória
     liberarLista(&lista);
     for(int i = 0; i < 1369; i++){

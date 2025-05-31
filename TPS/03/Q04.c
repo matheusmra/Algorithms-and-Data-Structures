@@ -557,11 +557,8 @@ int main() {
         printf("Falha ao carregar os dados.\n");
         return 1;
     }
-
     FilaCircular fila;
     criarFila(&fila);
-
-    // Entrada de dados iniciais (primeira parte)
     char input[1001];
     scanf(" %1000[^\n]", input);
     while(strcmp(input, "FIM") != 0){
@@ -570,14 +567,12 @@ int main() {
                 Show* novo = malloc(sizeof(Show));
                 *novo = clone(shows[i]);
                 inserirFila(&fila, novo);
-                printf("[Media] %d\n", mediaReleaseYear(&fila)); // Corrigido
+                printf("[Media] %d\n", mediaReleaseYear(&fila)); 
                 break;
             }
         }
         scanf(" %1000[^\n]", input);
     }
-
-    // Segunda parte: comandos
     int n;
     scanf("%d", &n);
     for(int i = 0; i < n; i++){
@@ -591,14 +586,14 @@ int main() {
                     Show* novo = malloc(sizeof(Show));
                     *novo = clone(shows[j]);
                     inserirFila(&fila, novo);
-                    printf("[Media] %d\n", mediaReleaseYear(&fila)); // Corrigido
+                    printf("[Media] %d\n", mediaReleaseYear(&fila)); 
                     break;
                 }
             }
         } else if(strcmp(comando, "R") == 0){
             if(fila.tamanho > 0) {
                 Show* removido = fila.array[fila.primeiro];
-                printf("(R) %s\n", removido->title); // Apenas o título
+                printf("(R) %s\n", removido->title);
                 free(removido);
                 fila.primeiro = (fila.primeiro + 1) % 5;
                 fila.tamanho--;
