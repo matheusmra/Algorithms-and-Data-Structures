@@ -1,7 +1,7 @@
 import java.io.*;
 import java.util.*;
 
-class Show { 
+class Show {
 
     private String showId;
     private String type;
@@ -30,7 +30,7 @@ class Show {
     }
 
     Show(String showId, String type, String title, String director, String[] cast, String country,
-            String dateAdded, int releaseYear, String rating, String duration, String[] listedIn){
+            String dateAdded, int releaseYear, String rating, String duration, String[] listedIn) {
         this.showId = showId;
         this.type = type;
         this.title = title;
@@ -44,53 +44,53 @@ class Show {
         this.listedIn = new String[listedIn.length];
     }
 
-    public String getShowId(){
+    public String getShowId() {
 
         return showId;
     }
 
-    public void setShowId(String x){
+    public void setShowId(String x) {
 
         this.showId = (x.equals("")) ? "NaN" : x;
     }
 
-    public String getType(){
+    public String getType() {
 
         return type;
     }
 
-    public void setType(String x){
-        
+    public void setType(String x) {
+
         this.type = (x.equals("")) ? "NaN" : x;
     }
 
-    public String getTitle(){
-        
+    public String getTitle() {
+
         return title;
     }
 
-    public void setTitle(String x){
+    public void setTitle(String x) {
         this.title = (x.equals("")) ? "NaN" : x;
     }
 
-    public String getDirector(){
-        
+    public String getDirector() {
+
         return director;
     }
 
-    public void setDirector(String x){
+    public void setDirector(String x) {
 
         this.director = (x.equals("")) ? "NaN" : x;
     }
 
-    public String[] getCast(){
-        
+    public String[] getCast() {
+
         return cast;
     }
 
-    public void setCast(String[] x){
+    public void setCast(String[] x) {
 
-        if(x.length == 1 && x[0].equals("")){
+        if (x.length == 1 && x[0].equals("")) {
 
             this.cast = new String[] { "NaN" };
         } else {
@@ -99,65 +99,64 @@ class Show {
         }
     }
 
-    public String getCountry(){
+    public String getCountry() {
 
         return country;
     }
 
-    
-    public void setCountry(String x){
+    public void setCountry(String x) {
 
         this.country = (x.equals("")) ? "NaN" : x;
     }
 
-    public String getDateAdded(){
-        
+    public String getDateAdded() {
+
         return dateAdded;
     }
 
-    public void setDateAdded(String x){
+    public void setDateAdded(String x) {
 
         this.dateAdded = (x.equals("")) ? "NaN" : x;
     }
 
-    public int getReleaseYear(){
+    public int getReleaseYear() {
 
         return releaseYear;
     }
 
-    public void setReleaseYear(int x){
+    public void setReleaseYear(int x) {
 
         this.releaseYear = x;
     }
 
-    public String getRating(){
-        
+    public String getRating() {
+
         return rating;
     }
 
-    public void setRating(String x){
+    public void setRating(String x) {
 
         this.rating = (x.equals("")) ? "NaN" : x;
     }
 
-    public String getDuration(){
+    public String getDuration() {
 
         return duration;
     }
 
-    public void setDuration(String x){
+    public void setDuration(String x) {
 
         this.duration = (x.equals("")) ? "NaN" : x;
     }
 
-    public String[] getListedIn(){
-        
+    public String[] getListedIn() {
+
         return listedIn;
     }
 
-    public void setListedIn(String[] listedIn){
+    public void setListedIn(String[] listedIn) {
 
-        if(listedIn.length == 1 && listedIn[0].equals("")){
+        if (listedIn.length == 1 && listedIn[0].equals("")) {
 
             this.listedIn = new String[] { "NaN" };
         } else {
@@ -166,14 +165,14 @@ class Show {
         }
     }
 
-
     /**
      * Função para clonar um show.
      * 
      * @return novo objeto Show com os mesmos dados
      */
-    public Show Clone(){
-        return new Show(this.showId,this.type,this.title,this.director,this.cast,this.country,this.dateAdded,this.releaseYear,this.rating,this.duration,this.listedIn);
+    public Show Clone() {
+        return new Show(this.showId, this.type, this.title, this.director, this.cast, this.country, this.dateAdded,
+                this.releaseYear, this.rating, this.duration, this.listedIn);
     }
 
     /**
@@ -181,13 +180,13 @@ class Show {
      * 
      * @param str String a ser transformada
      */
-    public int StrToInt(String str){
+    public int StrToInt(String str) {
 
         // Definir dados
         int len = str.length();
         int data = 0;
 
-        for(int i = 0; i < len; i++){
+        for (int i = 0; i < len; i++) {
 
             char c = str.charAt(i);
             data = (10 * data) + (c - '0');
@@ -201,7 +200,7 @@ class Show {
      * 
      * @param in Entrada de dados
      */
-    public void Ler(String in) throws Exception{
+    public void Ler(String in) throws Exception {
 
         // Definir dados
         String simplify = "";
@@ -209,7 +208,7 @@ class Show {
         int len = in.length();
 
         // Varrer String para verificar se está entre aspas
-        for(int i = 0; i < len; i++){
+        for (int i = 0; i < len; i++) {
 
             char c = in.charAt(i);
             if (c == '"')
@@ -255,7 +254,7 @@ class Show {
      * @param in String de entrada
      * @return Show criado
      */
-    public static Show Create(String in) throws Exception{
+    public static Show Create(String in) throws Exception {
         Show created = new Show();
         created.Ler(in);
         return created;
@@ -266,30 +265,29 @@ class Show {
      * 
      * @param caminho Caminho do CSV
      */
-public static ArrayList<Show> csv(String caminho) throws Exception {
-    ArrayList<Show> shows = new ArrayList<>();
-    File file = new File(caminho);
-    if (!file.exists()) {
-        throw new FileNotFoundException("Arquivo não encontrado: " + caminho);
-    }
-    try (Scanner sc = new Scanner(file)) {
-        while (sc.hasNext()) {
-            String data = sc.nextLine();
-            shows.add(Create(data));
+    public static ArrayList<Show> csv(String caminho) throws Exception {
+        ArrayList<Show> shows = new ArrayList<>();
+        File file = new File(caminho);
+        if (!file.exists()) {
+            throw new FileNotFoundException("Arquivo não encontrado: " + caminho);
         }
+        try (Scanner sc = new Scanner(file)) {
+            while (sc.hasNext()) {
+                String data = sc.nextLine();
+                shows.add(Create(data));
+            }
+        }
+        return shows;
     }
-    return shows;
-}
-
 
     /**
      * Função para trocar dois elementos do array
      * 
      * @param i     Índice do primeiro elemento
      * @param j     Índice do segundo elemento
-     * @param array Array de Strings 
+     * @param array Array de Strings
      */
-    public static void swap(int i, int j, String[] array){
+    public static void swap(int i, int j, String[] array) {
 
         String temp = array[i];
         array[i] = array[j];
@@ -307,10 +305,12 @@ public static ArrayList<Show> csv(String caminho) throws Exception {
         if (array == null || array.length == 0 || esq >= dir)
             return;
         int i = esq, j = dir;
-        String pivo = array[esq + (dir - esq) / 2]; 
+        String pivo = array[esq + (dir - esq) / 2];
         while (i <= j) {
-            while (array[i].compareTo(pivo) < 0) i++;
-            while (array[j].compareTo(pivo) > 0) j--;
+            while (array[i].compareTo(pivo) < 0)
+                i++;
+            while (array[j].compareTo(pivo) > 0)
+                j--;
             if (i <= j) {
                 swap(i, j, array);
                 i++;
@@ -318,10 +318,11 @@ public static ArrayList<Show> csv(String caminho) throws Exception {
             }
         }
         // Chamada recursiva
-        if (esq < j) quickSort(esq, j, array);
-        if (i < dir) quickSort(i, dir, array);
+        if (esq < j)
+            quickSort(esq, j, array);
+        if (i < dir)
+            quickSort(i, dir, array);
     }
-    
 
     public void Imprimir() {
 
@@ -331,7 +332,7 @@ public static ArrayList<Show> csv(String caminho) throws Exception {
         System.out.print(type + " ## ");
         System.out.print(director + " ## ");
         System.out.print("[");
-        if(cast != null && cast.length > 0)
+        if (cast != null && cast.length > 0)
             System.out.print(String.join(", ", cast));
         System.out.print("]");
         System.out.print(" ## ");
@@ -342,161 +343,73 @@ public static ArrayList<Show> csv(String caminho) throws Exception {
         System.out.print(duration + " ## ");
         System.out.print("[");
         // Categorias
-        if(listedIn != null && listedIn.length > 0)
+        if (listedIn != null && listedIn.length > 0)
             System.out.print(String.join(", ", listedIn));
         System.out.print("] ## ");
-        System.out.println(); 
+        System.out.println();
     }
 }
 
+class HashReserva {
+    private Show[] tabela;
+    private int tamHash = 21;
+    private int tamReserva = 9;
+    private int posReserva = 21; // início da área de reserva
+    private int reservaUsada = 0;
 
-class NoRN {
-    Show show;
-    NoRN esq, dir, pai;
-    boolean cor; // true = vermelho, false = preto
-
-    public NoRN(Show show) {
-        this.show = show;
-        this.esq = this.dir = this.pai = null;
-        this.cor = true; // novo nó sempre começa vermelho
+    public HashReserva() {
+        tabela = new Show[tamHash + tamReserva];
     }
-}
 
-class ArvoreAlvinegra {
-    private NoRN raiz;
-    public int comparacoes = 0;
+    private int hash(String title) {
+        int soma = 0;
+        for (int i = 0; i < title.length(); i++) {
+            soma += (int) title.charAt(i);
+        }
+        return soma % tamHash;
+    }
 
     public void inserir(Show show) {
-        NoRN novo = new NoRN(show);
-        raiz = inserir(raiz, novo, null);
-        balancearInsercao(novo);
-        raiz.cor = false; // raiz sempre preta
-    }
-
-    private NoRN inserir(NoRN no, NoRN novo, NoRN pai) {
-        if (no == null) {
-            novo.pai = pai;
-            return novo;
-        }
-        comparacoes++;
-        int cmp = novo.show.getTitle().compareTo(no.show.getTitle());
-        if (cmp < 0) {
-            no.esq = inserir(no.esq, novo, no);
-        } else if (cmp > 0) {
-            no.dir = inserir(no.dir, novo, no);
-        }
-        // se igual, não insere
-        return no;
-    }
-
-    private void balancearInsercao(NoRN no) {
-        while (no != null && no != raiz && cor(no.pai)) {
-            NoRN avo = no.pai.pai;
-            if (no.pai == avo.esq) {
-                NoRN tio = avo.dir;
-                if (cor(tio)) {
-                    no.pai.cor = false;
-                    tio.cor = false;
-                    avo.cor = true;
-                    no = avo;
-                } else {
-                    if (no == no.pai.dir) {
-                        no = no.pai;
-                        rotacaoEsq(no);
-                    }
-                    no.pai.cor = false;
-                    avo.cor = true;
-                    rotacaoDir(avo);
-                }
-            } else {
-                NoRN tio = avo.esq;
-                if (cor(tio)) {
-                    no.pai.cor = false;
-                    tio.cor = false;
-                    avo.cor = true;
-                    no = avo;
-                } else {
-                    if (no == no.pai.esq) {
-                        no = no.pai;
-                        rotacaoDir(no);
-                    }
-                    no.pai.cor = false;
-                    avo.cor = true;
-                    rotacaoEsq(avo);
-                }
-            }
-        }
-        raiz.cor = false;
-    }
-
-    private boolean cor(NoRN no) {
-        return no != null && no.cor;
-    }
-
-    private void rotacaoEsq(NoRN no) {
-        NoRN dir = no.dir;
-        no.dir = dir.esq;
-        if (dir.esq != null) dir.esq.pai = no;
-        dir.pai = no.pai;
-        if (no.pai == null) raiz = dir;
-        else if (no == no.pai.esq) no.pai.esq = dir;
-        else no.pai.dir = dir;
-        dir.esq = no;
-        no.pai = dir;
-    }
-
-    private void rotacaoDir(NoRN no) {
-        NoRN esq = no.esq;
-        no.esq = esq.dir;
-        if (esq.dir != null) esq.dir.pai = no;
-        esq.pai = no.pai;
-        if (no.pai == null) raiz = esq;
-        else if (no == no.pai.dir) no.pai.dir = esq;
-        else no.pai.esq = esq;
-        esq.dir = no;
-        no.pai = esq;
-    }
-
-    public boolean pesquisar(String nome) {
-        System.out.print("=>raiz  ");
-        return pesquisar(raiz, nome);
-    }
-
-    private boolean pesquisar(NoRN no, String nome) {
-        if (no == null) {
-            System.out.println("NAO");
-            return false;
-        }
-        comparacoes++;
-        int cmp = nome.compareTo(no.show.getTitle());
-        if (cmp == 0) {
-            System.out.println("SIM");
-            return true;
-        } else if (cmp < 0) {
-            System.out.print("esq ");
-            if (no.esq == null) {
-                System.out.println("NAO");
-                return false;
-            }
-            return pesquisar(no.esq, nome);
+        int pos = hash(show.getTitle());
+        if (tabela[pos] == null) {
+            tabela[pos] = show;
         } else {
-            System.out.print("dir ");
-            if (no.dir == null) {
-                System.out.println("NAO");
-                return false;
+            // Não insere duplicata
+            if (tabela[pos].getTitle().equals(show.getTitle()))
+                return;
+            for (int i = 0; i < reservaUsada; i++) {
+                if (tabela[posReserva + i] != null && tabela[posReserva + i].getTitle().equals(show.getTitle()))
+                    return; // já existe
             }
-            return pesquisar(no.dir, nome);
+            if (reservaUsada < tamReserva) {
+                tabela[posReserva + reservaUsada] = show;
+                reservaUsada++;
+            }
+            // Se reserva cheia, ignora inserção
         }
+    }
+
+    public int[] pesquisarDetalhado(String title) {
+        int pos = hash(title);
+        if (tabela[pos] != null && tabela[pos].getTitle().equals(title)) {
+            return new int[] { pos, 1 }; // achou na hash
+        }
+        for (int i = 0; i < reservaUsada; i++) {
+            if (tabela[posReserva + i] != null && tabela[posReserva + i].getTitle().equals(title)) {
+                return new int[] { posReserva + i, 1 };
+            }
+        }
+        return new int[] { pos, 0 };
     }
 }
 
-public class Q04 {
+public class Q05 {
     public static void main(String[] args) throws Exception {
         long inicio = System.currentTimeMillis();
         Show showManager = new Show();
         ArrayList<Show> shows = showManager.csv("/tmp/disneyplus.csv");
 
-        ArvoreAlvinegra arvore = new ArvoreAlvinegra();
+        HashReserva tabela = new HashReserva();
 
         // Inserção dos registros (entrada padrão até "FIM")
         Scanner sc = new Scanner(System.in);
@@ -504,7 +417,7 @@ public class Q04 {
         while (!linha.equals("FIM")) {
             for (Show s : shows) {
                 if (s != null && s.getShowId().equals(linha)) {
-                    arvore.inserir(s);
+                    tabela.inserir(s);
                     break;
                 }
             }
@@ -514,7 +427,9 @@ public class Q04 {
         // Pesquisa (entrada padrão até "FIM")
         linha = sc.nextLine();
         while (!linha.equals("FIM")) {
-            arvore.pesquisar(linha);
+            int[] resp = tabela.pesquisarDetalhado(linha);
+            System.out.print(" (Posicao: " + resp[0] + ") ");
+            System.out.println(resp[1] == 1 ? "SIM" : "NAO");
             linha = sc.nextLine();
         }
 
@@ -522,8 +437,8 @@ public class Q04 {
         double tempo = (fim - inicio) / 1000.0;
 
         // Log
-        try (PrintWriter log = new PrintWriter("848813_avinegra.txt")) {
-            log.printf("848813\t%.3f\t%d\n", tempo, arvore.comparacoes); 
+        try (PrintWriter log = new PrintWriter("848813_hashReserva.txt")) {
+            log.printf("848813\t%.3f\n", tempo);
         }
     }
 }

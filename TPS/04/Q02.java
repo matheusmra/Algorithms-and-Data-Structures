@@ -350,153 +350,121 @@ public static ArrayList<Show> csv(String caminho) throws Exception {
 }
 
 
-class NoRN {
+// Nó da árvore de títulos (secundária)
+class NoTitulo {
+    String title;
     Show show;
-    NoRN esq, dir, pai;
-    boolean cor; // true = vermelho, false = preto
+    NoTitulo esq, dir;
 
-    public NoRN(Show show) {
+    public NoTitulo(Show show) {
+        this.title = show.getTitle();
         this.show = show;
-        this.esq = this.dir = this.pai = null;
-        this.cor = true; // novo nó sempre começa vermelho
+        this.esq = this.dir = null;
     }
 }
 
-class ArvoreAlvinegra {
-    private NoRN raiz;
-    public int comparacoes = 0;
+// Árvore de títulos (secundária)
+class ArvoreTitulo {
+    private NoTitulo raiz;
 
     public void inserir(Show show) {
-        NoRN novo = new NoRN(show);
-        raiz = inserir(raiz, novo, null);
-        balancearInsercao(novo);
-        raiz.cor = false; // raiz sempre preta
+        raiz = inserir(raiz, show);
     }
 
-    private NoRN inserir(NoRN no, NoRN novo, NoRN pai) {
-        if (no == null) {
-            novo.pai = pai;
-            return novo;
-        }
-        comparacoes++;
-        int cmp = novo.show.getTitle().compareTo(no.show.getTitle());
-        if (cmp < 0) {
-            no.esq = inserir(no.esq, novo, no);
-        } else if (cmp > 0) {
-            no.dir = inserir(no.dir, novo, no);
-        }
-        // se igual, não insere
+    private NoTitulo inserir(NoTitulo no, Show show) {
+        if (no == null) return new NoTitulo(show);
+        int cmp = show.getTitle().compareTo(no.title);
+        if (cmp < 0) no.esq = inserir(no.esq, show);
+        else if (cmp > 0) no.dir = inserir(no.dir, show);
         return no;
     }
 
-    private void balancearInsercao(NoRN no) {
-        while (no != null && no != raiz && cor(no.pai)) {
-            NoRN avo = no.pai.pai;
-            if (no.pai == avo.esq) {
-                NoRN tio = avo.dir;
-                if (cor(tio)) {
-                    no.pai.cor = false;
-                    tio.cor = false;
-                    avo.cor = true;
-                    no = avo;
-                } else {
-                    if (no == no.pai.dir) {
-                        no = no.pai;
-                        rotacaoEsq(no);
-                    }
-                    no.pai.cor = false;
-                    avo.cor = true;
-                    rotacaoDir(avo);
-                }
-            } else {
-                NoRN tio = avo.esq;
-                if (cor(tio)) {
-                    no.pai.cor = false;
-                    tio.cor = false;
-                    avo.cor = true;
-                    no = avo;
-                } else {
-                    if (no == no.pai.esq) {
-                        no = no.pai;
-                        rotacaoDir(no);
-                    }
-                    no.pai.cor = false;
-                    avo.cor = true;
-                    rotacaoEsq(avo);
-                }
-            }
-        }
-        raiz.cor = false;
+    // Retorna o caminho da busca e se achou
+    public boolean pesquisar(String title, StringBuilder caminho) {
+        return pesquisar(raiz, title, caminho);
     }
 
-    private boolean cor(NoRN no) {
-        return no != null && no.cor;
-    }
-
-    private void rotacaoEsq(NoRN no) {
-        NoRN dir = no.dir;
-        no.dir = dir.esq;
-        if (dir.esq != null) dir.esq.pai = no;
-        dir.pai = no.pai;
-        if (no.pai == null) raiz = dir;
-        else if (no == no.pai.esq) no.pai.esq = dir;
-        else no.pai.dir = dir;
-        dir.esq = no;
-        no.pai = dir;
-    }
-
-    private void rotacaoDir(NoRN no) {
-        NoRN esq = no.esq;
-        no.esq = esq.dir;
-        if (esq.dir != null) esq.dir.pai = no;
-        esq.pai = no.pai;
-        if (no.pai == null) raiz = esq;
-        else if (no == no.pai.dir) no.pai.dir = esq;
-        else no.pai.esq = esq;
-        esq.dir = no;
-        no.pai = esq;
-    }
-
-    public boolean pesquisar(String nome) {
-        System.out.print("=>raiz  ");
-        return pesquisar(raiz, nome);
-    }
-
-    private boolean pesquisar(NoRN no, String nome) {
-        if (no == null) {
-            System.out.println("NAO");
-            return false;
-        }
-        comparacoes++;
-        int cmp = nome.compareTo(no.show.getTitle());
-        if (cmp == 0) {
-            System.out.println("SIM");
-            return true;
-        } else if (cmp < 0) {
-            System.out.print("esq ");
-            if (no.esq == null) {
-                System.out.println("NAO");
-                return false;
-            }
-            return pesquisar(no.esq, nome);
+    private boolean pesquisar(NoTitulo no, String title, StringBuilder caminho) {
+        if (no == null) return false;
+        int cmp = title.compareTo(no.title);
+        if (cmp == 0) return true;
+        else if (cmp < 0) {
+            caminho.append("esq ");
+            return pesquisar(no.esq, title, caminho);
         } else {
-            System.out.print("dir ");
-            if (no.dir == null) {
-                System.out.println("NAO");
-                return false;
-            }
-            return pesquisar(no.dir, nome);
+            caminho.append("dir ");
+            return pesquisar(no.dir, title, caminho);
         }
     }
 }
 
-public class Q04 {
+// Nó da árvore principal (primária)
+class NoAno {
+    int chave; // releaseYear % 15
+    NoAno esq, dir;
+    ArvoreTitulo titulos;
+
+    public NoAno(int chave) {
+        this.chave = chave;
+        this.esq = this.dir = null;
+        this.titulos = new ArvoreTitulo();
+    }
+}
+
+// Árvore principal (primária)
+class ArvoreAno {
+    private NoAno raiz;
+
+    public void inserir(Show show) {
+        int chave = show.getReleaseYear() % 15;
+        raiz = inserir(raiz, chave, show);
+    }
+
+    private NoAno inserir(NoAno no, int chave, Show show) {
+        if (no == null) {
+            NoAno novo = new NoAno(chave);
+            novo.titulos.inserir(show);
+            return novo;
+        }
+        if (chave < no.chave) no.esq = inserir(no.esq, chave, show);
+        else if (chave > no.chave) no.dir = inserir(no.dir, chave, show);
+        else no.titulos.inserir(show);
+        return no;
+    }
+
+    // Pesquisa: concatena o caminho de cada tentativa na árvore de títulos, separando por ESQ/DIR maiúsculo
+    public boolean pesquisar(String title, int releaseYear, StringBuilder caminho) {
+        int chave = releaseYear % 15;
+        caminho.append("raiz ");
+        return pesquisar(raiz, chave, title, caminho);
+    }
+
+    private boolean pesquisar(NoAno no, int chave, String title, StringBuilder caminho) {
+        if (no == null) return false;
+
+        StringBuilder caminhoTitulo = new StringBuilder();
+        boolean achou = no.titulos.pesquisar(title, caminhoTitulo);
+        caminho.append(caminhoTitulo);
+        if (achou) return true;
+
+        if (chave < no.chave) {
+            caminho.append("ESQ ");
+            return pesquisar(no.esq, chave, title, caminho);
+        } else if (chave > no.chave) {
+            caminho.append("DIR ");
+            return pesquisar(no.dir, chave, title, caminho);
+        }
+        return false;
+    }
+}
+
+public class Q02 {
     public static void main(String[] args) throws Exception {
         long inicio = System.currentTimeMillis();
         Show showManager = new Show();
         ArrayList<Show> shows = showManager.csv("/tmp/disneyplus.csv");
 
-        ArvoreAlvinegra arvore = new ArvoreAlvinegra();
+        ArvoreAno arvore = new ArvoreAno();
 
         // Inserção dos registros (entrada padrão até "FIM")
         Scanner sc = new Scanner(System.in);
@@ -514,7 +482,20 @@ public class Q04 {
         // Pesquisa (entrada padrão até "FIM")
         linha = sc.nextLine();
         while (!linha.equals("FIM")) {
-            arvore.pesquisar(linha);
+            Show encontrado = null;
+            for (Show s : shows) {
+                if (s != null && s.getTitle().equals(linha)) {
+                    encontrado = s;
+                    break;
+                }
+            }
+            StringBuilder caminho = new StringBuilder();
+            boolean achou = false;
+            if (encontrado != null) {
+                achou = arvore.pesquisar(encontrado.getTitle(), encontrado.getReleaseYear(), caminho);
+            }
+            System.out.print(caminho);
+            System.out.println(achou ? "SIM" : "NAO");
             linha = sc.nextLine();
         }
 
@@ -522,8 +503,8 @@ public class Q04 {
         double tempo = (fim - inicio) / 1000.0;
 
         // Log
-        try (PrintWriter log = new PrintWriter("848813_avinegra.txt")) {
-            log.printf("848813\t%.3f\t%d\n", tempo, arvore.comparacoes); 
+        try (PrintWriter log = new PrintWriter("848813_arvoreArvore.txt")) {
+            log.printf("848813\t%.3f\t%d\n", tempo, 0); 
         }
     }
 }
