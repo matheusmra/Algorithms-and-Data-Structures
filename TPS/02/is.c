@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include<stdbool.h>
 
-bool isVogal(char linha[], int size)
+bool x1(char linha[], int size)
 {
     bool resp = true;
 
@@ -18,7 +18,7 @@ bool isVogal(char linha[], int size)
     return resp;
 }
 
-bool isConsoante(char linha[], int size)
+bool x2(char linha[], int size)
 {
     bool resp = true;
 
@@ -40,7 +40,7 @@ bool isConsoante(char linha[], int size)
     return resp;
 }
 
-bool isInt(char linha[], int size)
+bool x3(char linha[], int size)
 {
     bool resp = true;
 
@@ -56,7 +56,7 @@ bool isInt(char linha[], int size)
     return resp;
 }
 
-bool isReal(char linha[], int size)
+bool x4(char linha[], int size)
 {
     bool resp = true;
     bool ponto = false;
@@ -121,38 +121,38 @@ int main()
     while(!(isFim(linha)))
     {
         int length = getSize(linha);
-        if(isVogal(linha, length))
+        if(x1(linha, length))
         {
             printf("SIM ");
         }
-        if(!(isVogal(linha, length)))
+        if(!(x1(linha, length)))
         {
             printf("NAO ");
         }
 
-        if(isConsoante(linha, length))
+        if(x2(linha, length))
         {
             printf("SIM ");
         }
-        if(!(isConsoante(linha, length)))
+        if(!(x2(linha, length)))
         {
             printf("NAO ");
         }
 
-        if(isInt(linha, length))
+        if(x3(linha, length))
         {
             printf("SIM ");
         }
-        if(!(isInt(linha, length)))
+        if(!(x3(linha, length)))
         {
             printf("NAO ");
         }
 
-        if(isReal(linha, length))
+        if(x4(linha, length))
         {
             printf("SIM ");
         }
-        if(!(isReal(linha, length)))
+        if(!(x4(linha, length)))
         {
             printf("NAO ");
         }
