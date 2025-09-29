@@ -1,6 +1,6 @@
 package TP04;
 
-class Jogo {
+class Game {
     private int id;
     private String name;
     private String releaseDate;
@@ -16,7 +16,7 @@ class Jogo {
     private String[] genres;
     private String[] tags;
 
-    Jogo() {
+    Game() {
         this.id = 0;
         this.name = null;
         this.releaseDate = null;
@@ -33,7 +33,7 @@ class Jogo {
         this.tags = null;
     }
 
-    Jogo(int id, String name, String releaseDate, int estimatedOwners, float price, String[] supportedLanguages,
+    Game(int id, String name, String releaseDate, int estimatedOwners, float price, String[] supportedLanguages,
             int metacriticScore, int userScore, int achievements, String[] categories, String[] genres, String[] tags) {
         this.id = id;
         this.name = name;
@@ -50,8 +50,8 @@ class Jogo {
     }
     //Metodo para Clonar para um jogo
     // @return Clone do Jogo
-    Jogo Clone(){
-        Jogo resp = new Jogo();
+    Game Clone(){
+        Game resp = new Game();
         resp.id = this.id;
         resp.name = this.name;
         resp.releaseDate = this.releaseDate;
@@ -71,47 +71,47 @@ class Jogo {
 
     //Getters e Setters
 
-    public int getJogoId() {
+    public int getGameId() {
         return id;
     }
 
-    public void setJogoId(int id){
+    public void setGameId(int id){
         this.id = id;
     }
 
-    public String getJogoName() {
+    public String getGameName() {
         return name;
     }
 
-    public int getJogoEstimatedOwners() {
+    public int getGameEstimatedOwners() {
         return estimatedOwners;
     }
 
-    public float getJogoPrice() {
+    public float getGamePrice() {
         return price;
     }
 
-    public String[] getJogoSupportedLanguages() {
+    public String[] getJGameSupportedLanguages() {
         return supportedLanguages;
     }
 
-    public int getJogoMetacriticScore() {
+    public int getGameMetacriticScore() {
         return metacriticScore;
     }
 
-    public int getJogoUserScore() {
+    public int getGameUserScore() {
         return userScore;
     }
 
-    public int getJogoAchievements() {
+    public int getGameAchievements() {
         return achievements;
     }
 
-    public String[] getJogoGenres() {
+    public String[] getGameGenres() {
         return genres;
     }
 
-    public String[] getJogoTags() {
+    public String[] getGameTags() {
         return genres;
     }
 }
