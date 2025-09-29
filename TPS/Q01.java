@@ -1,6 +1,6 @@
 package TP04;
 
-class Jogo{
+class Jogo {
     private int id;
     private String name;
     private String releaseDate;
@@ -16,8 +16,7 @@ class Jogo{
     private String[] genres;
     private String[] tags;
 
-
-    Jogo(){
+    Jogo() {
         this.id = 0;
         this.name = null;
         this.releaseDate = null;
@@ -34,8 +33,8 @@ class Jogo{
         this.tags = null;
     }
 
-    Jogo(int id,String name, String releaseDate, int estimatedOwners, float price
-    , String[] supportedLanguages, int metacriticScore, int userScore, int achievements, String[] categories, String[] genres, String[] tags){
+    Jogo(int id, String name, String releaseDate, int estimatedOwners, float price, String[] supportedLanguages,
+            int metacriticScore, int userScore, int achievements, String[] categories, String[] genres, String[] tags) {
         this.id = id;
         this.name = name;
         this.releaseDate = releaseDate;
@@ -50,15 +49,58 @@ class Jogo{
         this.tags = new String[tags.length];
     }
 
-    public int getJogoId(){
+    public int getJogoId() {
         return id;
     }
 
-    public String getJogoName(){
+    public String getJogoName() {
         return name;
     }
+
+    public int getJogoEstimatedOwners() {
+        return estimatedOwners;
+    }
+
+    public float getJogoPrice() {
+        return price;
+    }
+
+    public String[] getJogoSupportedLanguages() {
+        return supportedLanguages;
+    }
+
+    public int getJogoMetacriticScore() {
+        return metacriticScore;
+    }
+
+    public int getJogoUserScore() {
+        return userScore;
+    }
+
+    public int getJogoAchievements() {
+        return achievements;
+    }
+
+    public String[] getJogoGenres() {
+        return genres;
+    }
+
+    public String[] getJogoTags() {
+        return genres;
+    }
+
+    public void setJogoId(int id){
+        this.id = id;
+    }
+
+    public void setJogoReleaseDate(String releaseDate){
+        this.releaseDate = releaseDate; //incompleto
+    }
+
+    public void set
+
 }
 
 public class Q01 {
-    
+
 }
