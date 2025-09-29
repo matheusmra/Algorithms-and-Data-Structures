@@ -33,11 +33,6 @@ class Jogo {
         this.tags = null;
     }
 
-    Jogo Clone(){
-        Jogo resp = new Jogo();
-        resp.id = this.id;
-    }
-
     Jogo(int id, String name, String releaseDate, int estimatedOwners, float price, String[] supportedLanguages,
             int metacriticScore, int userScore, int achievements, String[] categories, String[] genres, String[] tags) {
         this.id = id;
@@ -53,9 +48,35 @@ class Jogo {
         this.genres = new String[genres.length];
         this.tags = new String[tags.length];
     }
+    //Metodo para Clonar para um jogo
+    // @return Clone do Jogo
+    Jogo Clone(){
+        Jogo resp = new Jogo();
+        resp.id = this.id;
+        resp.name = this.name;
+        resp.releaseDate = this.releaseDate;
+        resp.estimatedOwners = this.estimatedOwners;
+        resp.price = this.price;
+        resp.supportedLanguages = this.supportedLanguages;
+        resp.metacriticScore = this.metacriticScore;
+        resp.userScore = this.userScore;
+        resp.achievements = this.achievements;
+        resp.publishers = this.publishers;
+        resp.developers = this.developers;
+        resp.categories = this.categories;
+        resp.genres = this.genres;
+        resp.tags = this.tags;
+        return resp;
+    }
+
+    //Getters e Setters
 
     public int getJogoId() {
         return id;
+    }
+
+    public void setJogoId(int id){
+        this.id = id;
     }
 
     public String getJogoName() {
@@ -93,20 +114,8 @@ class Jogo {
     public String[] getJogoTags() {
         return genres;
     }
-
-    public void setJogoId(int id){
-        this.id = id;
-    }
-
-    public void setJogoReleaseDate(String releaseDate){
-        this.releaseDate = releaseDate; //incompleto
-    }
-
-    public void set
-
 }
 
 public class Q01 {
 
 }
-
