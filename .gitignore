@@ -1,3 +1,7 @@
 beecrowd/AD-HOC/1397.exe
 *.o
 *.exe
+*.class
+*.out
+*.in
+*.csv
