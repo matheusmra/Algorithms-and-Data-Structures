@@ -622,7 +622,7 @@ public class Q01 {
                     }
                 }
             } catch (NumberFormatException e) {
-                // Ignora entradas inválidas silenciosamente
+                return;
             }
         }
         
