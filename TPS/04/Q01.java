@@ -577,7 +577,7 @@ class Game {
      */
     @Override
     public String toString() {
-        return String.format("=> %d ## %s ## %s ## %d ## %.2f ## [%s] ## %d ## %.1f ## %d ## [%s] ## [%s] ## [%s] ## [%s] ## [%s] ##",
+        return String.format("=> %d ## %s ## %s ## %d ## %.1f ## [%s] ## %d ## %.1f ## %d ## [%s] ## [%s] ## [%s] ## [%s] ## [%s] ##",
                 id, name, releaseDate, estimatedOwners, price,
                 arrayToString(supportedLanguages), metacriticScore, userScore,
                 achievements, arrayToString(publishers), arrayToString(developers),
