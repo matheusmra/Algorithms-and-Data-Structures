@@ -323,9 +323,7 @@ void arrayToString(char array[MAX_ARRAY_SIZE][MAX_FIELD_LENGTH], int count, char
 }
 
 /**
- * Função para exibir um Game no formato especificado pelo sistema
- * Imprime todos os dados do jogo formatados conforme o padrão estabelecido
- * com separadores "##" e arrays entre colchetes
+ * Função para exibir um Game 
  * @param game - Ponteiro para a estrutura Game a ser impressa
  */
 void printGame(Game *game) {
@@ -343,11 +341,31 @@ void printGame(Game *game) {
     arrayToString(game->genres, game->genresCount, genStr);
     arrayToString(game->tags, game->tagsCount, tagStr);
 
-    printf("=> %d ## %s ## %s ## %d ## %.1f ## [%s] ## %d ## %.1f ## %d ## [%s] ## [%s] ## [%s] ## [%s] ## [%s] ##\n",
-           game->id, game->name, game->releaseDate, game->estimatedOwners, game->price,
-           langStr, game->metacriticScore, game->userScore, game->achievements,
-           pubStr, devStr, catStr, genStr, tagStr);
+    // Formatação inteligente do preço dentro da função printGame
+    if (game->price == (int)game->price) {
+        // Número inteiro: formato com 1 casa decimal (ex: 2.0)
+        printf("=> %d ## %s ## %s ## %d ## %.1f ## [%s] ## %d ## %.1f ## %d ## [%s] ## [%s] ## [%s] ## [%s] ## [%s] ##\n",
+               game->id, game->name, game->releaseDate, game->estimatedOwners, game->price,
+               langStr, game->metacriticScore, game->userScore, game->achievements,
+               pubStr, devStr, catStr, genStr, tagStr);
+    } else {
+        // Tem decimais: verificar se termina em 0
+        char tempPrice[20];
+        sprintf(tempPrice, "%.2f", game->price);
+        
+        // Remove zero final desnecessário (ex: 2.90 vira 2.9)
+        int len = strlen(tempPrice);
+        if (len > 2 && tempPrice[len-1] == '0' && tempPrice[len-2] != '.') {
+            tempPrice[len-1] = '\0';
+        }
+        
+        printf("=> %d ## %s ## %s ## %d ## %s ## [%s] ## %d ## %.1f ## %d ## [%s] ## [%s] ## [%s] ## [%s] ## [%s] ##\n",
+               game->id, game->name, game->releaseDate, game->estimatedOwners, tempPrice,
+               langStr, game->metacriticScore, game->userScore, game->achievements,
+               pubStr, devStr, catStr, genStr, tagStr);
+    }
 }
+
 
 /**
  * Função principal do programa
@@ -358,7 +376,6 @@ void printGame(Game *game) {
 int main() {
     setlocale(LC_ALL, "");
 
-    // Agora games está no heap
     Game *games = malloc(sizeof(Game) * MAX_GAMES);
     if (games == NULL) {
         printf("Erro ao alocar memória\n");
@@ -366,7 +383,7 @@ int main() {
     }
 
     int gameCount = 0;
-    FILE *file = fopen("C:\\Users\\mathe\\OneDrive\\Documentos\\Faculdade\\AEDS2\\TPS\\04\\games.csv", "r");
+    FILE *file = fopen("/tmp/games.csv", "r");
     if (file == NULL) {
         printf("Erro ao abrir arquivo\n");
         free(games);

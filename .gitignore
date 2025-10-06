@@ -5,3 +5,6 @@ beecrowd/AD-HOC/1397.exe
 *.out
 *.in
 *.csv
+.vscode/c_cpp_properties.json
+.vscode/launch.json
+.vscode/tasks.json

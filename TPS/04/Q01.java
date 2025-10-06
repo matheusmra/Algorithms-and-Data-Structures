@@ -615,9 +615,23 @@ class Game {
      */
     @Override
     public String toString() {
+        // Formatação inteligente do preço
+        String priceStr;
+        if (price == (int) price) {
+            // Número inteiro: formato com 1 casa decimal (ex: 2.0)
+            priceStr = String.format("%.1f", price);
+        } else {
+            // Tem decimais: formato com 2 casas, mas remove zero final se necessário
+            priceStr = String.format("%.2f", price);
+            // Remove zero final desnecessário (ex: 2.90 vira 2.9)
+            if (priceStr.endsWith("0") && !priceStr.endsWith(".0")) {
+                priceStr = priceStr.substring(0, priceStr.length() - 1);
+            }
+        }
+
         return String.format(
-                "=> %d ## %s ## %s ## %d ## %.2f ## [%s] ## %d ## %.1f ## %d ## [%s] ## [%s] ## [%s] ## [%s] ## [%s] ##",
-                id, name, releaseDate, estimatedOwners, price,
+                "=> %d ## %s ## %s ## %d ## %s ## [%s] ## %d ## %.1f ## %d ## [%s] ## [%s] ## [%s] ## [%s] ## [%s] ##",
+                id, name, releaseDate, estimatedOwners, priceStr,
                 arrayToString(supportedLanguages), metacriticScore, userScore,
                 achievements, arrayToString(publishers), arrayToString(developers),
                 arrayToString(categories), arrayToString(genres), arrayToString(tags));
@@ -689,7 +703,7 @@ class Pilha {
         }
         return null;
     }
-    
+
 }
 
 class Celula {
@@ -716,7 +730,7 @@ public class Q01 {
         // Carregar todos os jogos do CSV com codificação UTF-8
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(
-                    new FileInputStream("C:\\Users\\1516537\\Desktop\\AEDS2\\TP04\\games.csv"),
+                    new FileInputStream("/tmp/games.csv"),
                     "UTF-8"));
             String linha = br.readLine(); // Pular cabeçalho
             while ((linha = br.readLine()) != null) {
