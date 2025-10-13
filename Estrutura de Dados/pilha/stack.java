@@ -3,7 +3,6 @@ class Celula {
 	public int elemento; // Elemento inserido na celula.
 	public Celula prox; // Aponta a celula prox.
 
-
 	/**
 	 * Construtor da classe.
 	 */
@@ -13,11 +12,12 @@ class Celula {
 
 	/**
 	 * Construtor da classe.
+	 * 
 	 * @param elemento int inserido na celula.
 	 */
 	public Celula(int elemento) {
-      this.elemento = elemento;
-      this.prox = null;
+		this.elemento = elemento;
+		this.prox = null;
 	}
 }
 
@@ -28,8 +28,7 @@ class Pilha {
 		topo = null;
 	}
 
-
-	public void push(int x){
+	public void push(int x) {
 		Celula tmp = new Celula(x);
 		tmp.prox = topo;
 		topo = tmp;
@@ -49,7 +48,6 @@ class Pilha {
 		return resp;
 	}
 
-
 	public void show() {
 		System.out.print("[ ");
 		for (Celula i = topo; i != null; i = i.prox) {
@@ -58,41 +56,63 @@ class Pilha {
 		System.out.println("] ");
 	}
 
-	public int maior_elemento(){
+	public int soma_elementos() {
+		int soma = 0;
+		for (Celula i = topo; i != null; i = i.prox) {
+			soma += i.elemento;
+		}
+		return soma;
+	}
+
+	public int soma_recursiva(Celula i) {
+		if (i.prox == null) {
+			return 0;
+		}
+		return i.elemento + soma_recursiva(i.prox);
+
+	}
+
+	public int maior_elemento() {
 		int maior = topo.elemento;
-		for(Celula i = topo; i != null; i = i.prox){
-			if(i.elemento > maior){
+		for (Celula i = topo; i != null; i = i.prox) {
+			if (i.elemento > maior) {
 				maior = i.elemento;
 			}
 		}
 		return maior;
 	}
 
-	public void inverter() {
-    Pilha aux = new Pilha();
+	public int maior_recursivo(Celula i) {
+		if (i == null) {
+			return 0;
+		}
+		int maiorRestante = maior_recursivo(i.prox);
 
-    while (topo != null) {
-        try {
-            aux.push(pop());
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
+		return (i.elemento > maiorRestante) ? i.elemento : maiorRestante;
 
-    topo = aux.topo;
+	}
+
+
+	public void mostrar_ordem_insercao(){
+		Pilha aux = new Pilha();
+		for(Celula i = topo; i !=null; i = i.prox){
+			aux.push(i.elemento);
+		}
+		for(Celula j = aux.topo; j != null; j = j.prox){
+			System.out.println(j.elemento);
+		}
+	}
+
 }
 
- }
-
 public class stack {
-	public static void main(String[] args){
+	public static void main(String[] args) {
 		Pilha p = new Pilha();
 		p.push(10);
 		p.push(1);
 		p.push(50);
 		p.show();
-		
-		p.inverter();
+
 		p.show();
 	}
 }
