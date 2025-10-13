@@ -1,424 +1,407 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <locale.h>
+#include <ctype.h>
 
-#define MAX_LINE_LENGTH 5000
-#define MAX_FIELD_LENGTH 1000
-#define MAX_ARRAY_SIZE 100
-#define MAX_GAMES 1852
+#define MAX_STR 256
+#define MAX_ARRAY 50
+#define MAX_LINE 4096
+#define MAX_GAMES 2000
 
 typedef struct {
-    int id;
-    char name[MAX_FIELD_LENGTH];
+    int appID;
+    char name[MAX_STR];
     char releaseDate[20];
     int estimatedOwners;
-    float price;
-    char supportedLanguages[MAX_ARRAY_SIZE][MAX_FIELD_LENGTH];
-    int supportedLanguagesCount;
+    double price;
+    char *supportedLanguages[MAX_ARRAY];
     int metacriticScore;
-    float userScore;
+    double userScore;
     int achievements;
-    char publishers[MAX_ARRAY_SIZE][MAX_FIELD_LENGTH];
-    int publishersCount;
-    char developers[MAX_ARRAY_SIZE][MAX_FIELD_LENGTH];
-    int developersCount;
-    char categories[MAX_ARRAY_SIZE][MAX_FIELD_LENGTH];
-    int categoriesCount;
-    char genres[MAX_ARRAY_SIZE][MAX_FIELD_LENGTH];
-    int genresCount;
-    char tags[MAX_ARRAY_SIZE][MAX_FIELD_LENGTH];
-    int tagsCount;
+    char *publishers[MAX_ARRAY];
+    char *developers[MAX_ARRAY];
+    char *categories[MAX_ARRAY];
+    char *genres[MAX_ARRAY];
+    char *tags[MAX_ARRAY];
 } Game;
 
-/**
- * Função para inicializar um Game com valores padrão
- * Define todos os campos da estrutura com valores iniciais apropriados
- * @param game - Ponteiro para a estrutura Game a ser inicializada
- */
-void initGame(Game *game) {
-    game->id = 0;
-    strcpy(game->name, "");
-    strcpy(game->releaseDate, "");
-    game->estimatedOwners = 0;
-    game->price = 0.0f;
-    game->supportedLanguagesCount = 0;
-    game->metacriticScore = -1;
-    game->userScore = -1.0f;
-    game->achievements = 0;
-    game->publishersCount = 0;
-    game->developersCount = 0;
-    game->categoriesCount = 0;
-    game->genresCount = 0;
-    game->tagsCount = 0;
-}
+
 
 /**
- * Função para extrair apenas os números de uma string
- * Remove todos os caracteres não numéricos e retorna o valor inteiro
- * @param str - String contendo números e outros caracteres
- * @return Número inteiro extraído da string, ou 0 se não houver números
+ * Remove espaços em branco do início e fim de uma string.
+ *
+ * @param str Ponteiro para a string a ser trimada.
  */
-int extractNumbers(char *str) {
-    char numbers[MAX_FIELD_LENGTH] = "";
-    int j = 0;
-
-    for (int i = 0; str[i] != '\0'; i++) {
-        if (str[i] >= '0' && str[i] <= '9') {
-            numbers[j++] = str[i];
-        }
-    }
-    numbers[j] = '\0';
-
-    return (strlen(numbers) > 0) ? atoi(numbers) : 0;
-}
-
-/**
- * Função para normalizar formato de data do CSV para padrão brasileiro
- * Converte datas do formato "MMM dd, yyyy" para "dd/mm/yyyy"
- * Trata casos com informações incompletas usando "01" como padrão
- * @param data - String contendo a data no formato original
- * @param result - String onde será armazenado o resultado formatado
- */
-void normalizarData(char *data, char *result) {
-    if (data == NULL || strlen(data) == 0) {
-        strcpy(result, "");
-        return;
-    }
-
-    char *meses[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-
-    char dataCopy[MAX_FIELD_LENGTH];
-    strcpy(dataCopy, data);
-
-    char *token = strtok(dataCopy, " ");
-    char mes[10] = "", dia[10] = "", ano[10] = "";
-    int count = 0;
-
-    while (token != NULL && count < 3) {
-        if (count == 0) strcpy(mes, token);
-        else if (count == 1) {
-            strcpy(dia, token);
-            dia[strcspn(dia, ",")] = '\0';
-        }
-        else if (count == 2) strcpy(ano, token);
-        count++;
-        token = strtok(NULL, " ");
-    }
-
-    if (count == 3) {
-        int numMes = 1;
-        for (int i = 0; i < 12; i++) {
-            if (strcmp(meses[i], mes) == 0) {
-                numMes = i + 1;
-                break;
-            }
-        }
-        sprintf(result, "%02d/%02d/%s", atoi(dia), numMes, ano);
-    } else if (count == 2) {
-        int numMes = 1;
-        for (int i = 0; i < 12; i++) {
-            if (strcmp(meses[i], mes) == 0) {
-                numMes = i + 1;
-                break;
-            }
-        }
-        sprintf(result, "01/%02d/%s", numMes, ano);
-    } else if (count == 1) {
-        sprintf(result, "01/01/%s", mes);
-    } else {
-        strcpy(result, data);
-    }
-}
-
-/**
- * Função para extrair elementos de um array formatado entre colchetes
- * Processa campos do CSV que contêm listas no formato ['item1', 'item2', ...]
- * Remove aspas simples e espaços desnecessários dos elementos
- * @param campo - String contendo o array a ser processado
- * @param array - Matriz bidimensional onde serão armazenados os elementos
- * @return Número de elementos extraídos e armazenados no array
- */
-int extrairArray(char *campo, char array[MAX_ARRAY_SIZE][MAX_FIELD_LENGTH]) {
-    if (campo == NULL || strlen(campo) == 0) {
-        return 0;
-    }
-
-    int count = 0;
-
-    if (campo[0] == '[' && campo[strlen(campo)-1] == ']') {
-        char conteudo[MAX_FIELD_LENGTH * 10];
-        strncpy(conteudo, campo + 1, strlen(campo) - 2);
-        conteudo[strlen(campo) - 2] = '\0';
-
-        if (strlen(conteudo) == 0) return 0;
-
-        int i = 0, j = 0;
-        int dentroAspas = 0;
-        char item[MAX_FIELD_LENGTH] = "";
-
-        while (i < strlen(conteudo)) {
-            char c = conteudo[i];
-
-            if (c == '\'' && (i == 0 || conteudo[i-1] != '\\')) {
-                dentroAspas = !dentroAspas;
-            } else if (c == ',' && !dentroAspas) {
-                if (item[0] == '\'' && item[strlen(item)-1] == '\'') {
-                    item[strlen(item)-1] = '\0';
-                    strcpy(array[count], item + 1);
-                } else {
-                    strcpy(array[count], item);
-                }
-
-                char *start = array[count];
-                while (*start == ' ') start++;
-                if (start != array[count]) {
-                    memmove(array[count], start, strlen(start) + 1);
-                }
-
-                if (strlen(array[count]) > 0) count++;
-                strcpy(item, "");
-                j = 0;
-
-                while (i + 1 < strlen(conteudo) && conteudo[i + 1] == ' ') i++;
-            } else {
-                item[j++] = c;
-                item[j] = '\0';
-            }
-            i++;
-        }
-
-        if (strlen(item) > 0) {
-            if (item[0] == '\'' && item[strlen(item)-1] == '\'') {
-                item[strlen(item)-1] = '\0';
-                strcpy(array[count], item + 1);
-            } else {
-                strcpy(array[count], item);
-            }
-
-            char *start = array[count];
-            while (*start == ' ') start++;
-            if (start != array[count]) {
-                memmove(array[count], start, strlen(start) + 1);
-            }
-
-            if (strlen(array[count]) > 0) count++;
-        }
-    } else if (strchr(campo, ',') != NULL) {
-        char *token = strtok(campo, ",");
-        while (token != NULL && count < MAX_ARRAY_SIZE) {
-            while (*token == ' ') token++;
-            char *end = token + strlen(token) - 1;
-            while (end > token && *end == ' ') end--;
-            *(end + 1) = '\0';
-
-            strcpy(array[count], token);
-            count++;
-            token = strtok(NULL, ",");
-        }
-    } else {
-        strcpy(array[0], campo);
-        count = 1;
-    }
-
-    return count;
-}
-
-/**
- * Função para fazer parsing de uma linha CSV respeitando aspas e vírgulas
- * Separa os campos de uma linha CSV tratando corretamente campos entre aspas
- * que podem conter vírgulas internas
- * @param linha - String contendo a linha completa do arquivo CSV
- * @param campos - Matriz onde serão armazenados os campos separados
- * @return Número de campos extraídos da linha
- */
-int parseCSVLine(char *linha, char campos[20][MAX_FIELD_LENGTH * 5]) {
-    int count = 0;
+void trim_inplace(char *str) {
     int i = 0;
-    int dentroAspas = 0;
-    char campo[MAX_FIELD_LENGTH * 5] = "";
-    int j = 0;
+    while (isspace((unsigned char)str[i])) i++;
+    if (i > 0) memmove(str, str + i, strlen(str + i) + 1);
 
-    while (i < strlen(linha) && count < 20) {
-        char c = linha[i];
+    int len = strlen(str);
+    while (len > 0 && isspace((unsigned char)str[len - 1])) str[--len] = '\0';
+}
 
-        if (c == '"') {
-            dentroAspas = !dentroAspas;
-        } else if (c == ',' && !dentroAspas) {
-            campo[j] = '\0';
-            strcpy(campos[count], campo);
-            count++;
-            strcpy(campo, "");
-            j = 0;
-        } else {
-            campo[j++] = c;
-        }
+/**
+ * Converte uma string numérica para int.
+ *
+ * @param s Ponteiro para a string contendo o número.
+ * @return Valor inteiro convertido.
+ */
+int stringParaInt(const char *s) {
+    if (!s) return 0;
+    int sign = 1, i = 0;
+    if (s[0] == '-') { sign = -1; i = 1; }
+    long val = 0;
+    for (; s[i] != '\0'; i++) {
+        if (s[i] < '0' || s[i] > '9') break;
+        val = val * 10 + (s[i] - '0');
+    }
+    return (int)(val * sign);
+}
+
+/**
+ * Converte uma string numérica para double.
+ *
+ * @param s Ponteiro para a string contendo o número.
+ * @return Valor double convertido..
+ */
+double stringParaDouble(const char *s) {
+    if (!s) return 0.0;
+    double inteiro = 0.0, frac = 0.0;
+    int i = 0, neg = 0;
+    if (s[0] == '-') { neg = 1; i = 1; }
+    while (s[i] && s[i] != '.') {
+        if (s[i] >= '0' && s[i] <= '9') inteiro = inteiro * 10 + (s[i] - '0');
+        else break;
         i++;
     }
-
-    campo[j] = '\0';
-    strcpy(campos[count], campo);
-    count++;
-
-    while (count < 14) {
-        strcpy(campos[count], "");
-        count++;
+    if (s[i] == '.') {
+        i++;
+        double base = 1;
+        while (s[i]) {
+            if (s[i] >= '0' && s[i] <= '9') {
+                frac = frac * 10 + (s[i] - '0');
+                base *= 10;
+            } else break;
+            i++;
+        }
+        frac = frac / base;
     }
+    double total = inteiro + frac;
+    return neg ? -total : total;
+}
 
+/**
+ * Converte abreviação de mês.
+ *
+ * @param mes Abreviação do mês .
+ * @return Ponteiro para string.
+ */
+const char* mesParaNumero(const char *mes) {
+    if (strcmp(mes, "Jan") == 0) return "01"; if (strcmp(mes, "Feb") == 0) return "02";
+    if (strcmp(mes, "Mar") == 0) return "03"; if (strcmp(mes, "Apr") == 0) return "04";
+    if (strcmp(mes, "May") == 0) return "05"; if (strcmp(mes, "Jun") == 0) return "06";
+    if (strcmp(mes, "Jul") == 0) return "07"; if (strcmp(mes, "Aug") == 0) return "08";
+    if (strcmp(mes, "Sep") == 0) return "09"; if (strcmp(mes, "Oct") == 0) return "10";
+    if (strcmp(mes, "Nov") == 0) return "11"; if (strcmp(mes, "Dec") == 0) return "12";
+    return "01";
+}
+
+/**
+ * Normaliza datas em vários formatos para o formato DD/MM/YYYY.
+ *
+ * @param entrada String de entrada com a data.
+ * @param saida Buffer onde será escrita a data normalizada.
+ * @param saida_size Tamanho do buffer de saída.
+ */
+void converterData(const char *entrada, char *saida, size_t saida_size) {
+    if (!entrada || entrada[0] == '\0') {
+        strncpy(saida, "01/01/1900", saida_size); saida[saida_size-1] = '\0'; return;
+    }
+    char temp[64]; strncpy(temp, entrada, sizeof(temp)-1); temp[sizeof(temp)-1] = '\0';
+    char mes[16] = "", dia[8] = "01", ano[16] = "1900";
+    int parts = sscanf(temp, "%15s %7s %15s", mes, dia, ano);
+    if (parts == 3) {
+        char *p = strchr(dia, ',');
+        if (p) *p = '\0';
+    } else if (parts == 2) {
+        strcpy(ano, dia); strcpy(dia, "01");
+    } else if (parts == 1) {
+        strcpy(ano, mes); strcpy(mes, "Jan");
+    }
+    int di = stringParaInt(dia);
+    const char *mm = mesParaNumero(mes);
+    snprintf(saida, saida_size, "%02d/%s/%s", di, mm, ano);
+}
+
+/**
+ * Método auxiliar para extrair arrays de strings entre colchetes.
+ *
+ * @param campo String contendo o array a ser extraído.
+ * @param saida Array de char* onde serão armazenadas strings alocadas.
+ * @param max_saida Capacidade máxima do array saida.
+ * @return Número de elementos extraídos.
+ */
+int quebrarArray(const char *campo, char *saida[], int max_saida) {
+    if (!campo) return 0;
+    char buf[MAX_STR];
+    int j = 0, count = 0;
+    for (int i = 0; campo[i] != '\0'; i++) {
+        char c = campo[i];
+        if (c == '[' || c == ']' || c == '\'') continue;
+        if (c == ',') {
+            buf[j] = '\0';
+            trim_inplace(buf);
+            if (j > 0 && count < max_saida) {
+                saida[count] = malloc(strlen(buf) + 1);
+                strcpy(saida[count], buf);
+                count++;
+            }
+            j = 0;
+        } else {
+            if (j < (int)sizeof(buf) - 1) buf[j++] = c;
+            else {
+                // se exceder, truncamos o token para evitar overflow
+                buf[j] = '\0';
+            }
+        }
+    }
+    buf[j] = '\0';
+    trim_inplace(buf);
+    if (j > 0 && count < max_saida) {
+        saida[count] = malloc(strlen(buf) + 1);
+        strcpy(saida[count++], buf);
+    }
+    // marca sentinel NULL para indicar fim do array
+    if (count < max_saida) saida[count] = NULL;
+    else saida[max_saida-1] = NULL;
     return count;
 }
 
-/**
- * Função para processar uma linha CSV e popular uma estrutura Game
- * Extrai todos os dados de uma linha do arquivo CSV e preenche os campos
- * correspondentes na estrutura Game com tratamento adequado de tipos
- * @param linha - String contendo a linha do CSV a ser processada
- * @param game - Ponteiro para a estrutura Game a ser preenchida
- */
-void lerGame(char *linha, Game *game) {
-    // Agora "campos" não fica mais na stack de cada chamada
-    static char campos[20][MAX_FIELD_LENGTH * 5];
-    parseCSVLine(linha, campos);
-
-    game->id = atoi(campos[0]);
-    strcpy(game->name, campos[1]);
-    normalizarData(campos[2], game->releaseDate);
-    game->estimatedOwners = extractNumbers(campos[3]);
-
-    if (strcmp(campos[4], "Free to Play") == 0 || strlen(campos[4]) == 0) {
-        game->price = 0.0f;
-    } else {
-        game->price = atof(campos[4]);
-    }
-
-    game->supportedLanguagesCount = extrairArray(campos[5], game->supportedLanguages);
-    game->metacriticScore = (strlen(campos[6]) == 0) ? -1 : atoi(campos[6]);
-    game->userScore = (strlen(campos[7]) == 0 || strcmp(campos[7], "tbd") == 0) ? -1.0f : atof(campos[7]);
-    game->achievements = (strlen(campos[8]) == 0) ? 0 : atoi(campos[8]);
-
-    game->publishersCount = extrairArray(campos[9], game->publishers);
-    game->developersCount = extrairArray(campos[10], game->developers);
-    game->categoriesCount = extrairArray(campos[11], game->categories);
-    game->genresCount = extrairArray(campos[12], game->genres);
-    game->tagsCount = extrairArray(campos[13], game->tags);
-}
 
 /**
- * Função para converter um array de strings em uma única string formatada
- * Concatena todos os elementos do array separados por vírgulas e espaços
- * Utilizada para formatar arrays de dados antes da impressão
- * @param array - Matriz bidimensional contendo as strings a serem concatenadas
- * @param count - Número de elementos válidos no array
- * @param result - String onde será armazenado o resultado concatenado
+ * Divide uma linha CSV em campos.
+ * Aloca cada campo com malloc.
+ *
+ * @param linha Linha CSV a ser dividida.
+ * @param campos Vetor de char* onde serão colocados ponteiros para strings alocadas.
+ * @param maxCampos Capacidade máxima do vetor campos.
+ * @return Número de campos encontrados.
  */
-void arrayToString(char array[MAX_ARRAY_SIZE][MAX_FIELD_LENGTH], int count, char *result) {
-    strcpy(result, "");
-    for (int i = 0; i < count; i++) {
-        strcat(result, array[i]);
-        if (i < count - 1) {
-            strcat(result, ", ");
+int dividirCSV(const char *linha, char *campos[], int maxCampos) {
+    char campoAtual[MAX_LINE];
+    int j = 0, dentroAspas = 0, count = 0;
+    for (int i = 0; ; i++) {
+        char c = linha[i];
+        if (c == '"') {
+            // trata aspas duplas escapadas ""
+            if (linha[i+1] == '"') {
+                if (j < (int)sizeof(campoAtual) - 1) campoAtual[j++] = '"';
+                i++; // pula a segunda aspa
+            } else {
+                dentroAspas = !dentroAspas;
+            }
+        } else if ((c == ',' && !dentroAspas) || c == '\0' || c == '\n' || c == '\r') {
+            campoAtual[j] = '\0';
+            if (count < maxCampos) {
+                campos[count] = malloc(strlen(campoAtual) + 1);
+                strcpy(campos[count], campoAtual);
+                trim_inplace(campos[count]);
+                // remover aspas externas se existirem
+                size_t len = strlen(campos[count]);
+                if (len >= 2 && campos[count][0] == '"' && campos[count][len-1] == '"') {
+                    // move para esquerda e remove ultima
+                    memmove(campos[count], campos[count]+1, len-2);
+                    campos[count][len-2] = '\0';
+                    // desfaz escape de aspas duplas
+                    char *src = campos[count], *dst = campos[count];
+                    while (*src) {
+                        if (src[0] == '"' && src[1] == '"') { *dst++ = '"'; src += 2; }
+                        else *dst++ = *src++;
+                    }
+                    *dst = '\0';
+                    trim_inplace(campos[count]);
+                }
+            }
+            count++;
+            j = 0;
+            if (c == '\0' || c == '\n') break;
+        } else {
+            if (j < (int)sizeof(campoAtual) - 1) campoAtual[j++] = c;
+            else {
+                // truncar para evitar overflow
+            }
         }
     }
+    return count < maxCampos ? count : maxCampos;
 }
 
 /**
- * Função para exibir um Game 
- * @param game - Ponteiro para a estrutura Game a ser impressa
+ * Formata e imprime o preço seguindo as regras do enunciado:
+
+ * @param price Valor do preço a ser impresso.
  */
-void printGame(Game *game) {
-    char langStr[MAX_FIELD_LENGTH * 10] = "";
-    char pubStr[MAX_FIELD_LENGTH * 10] = "";
-    char devStr[MAX_FIELD_LENGTH * 10] = "";
-    char catStr[MAX_FIELD_LENGTH * 10] = "";
-    char genStr[MAX_FIELD_LENGTH * 10] = "";
-    char tagStr[MAX_FIELD_LENGTH * 10] = "";
+static void printPrice(double price) {
+    // se for zero (Free to Play), mostrar 0.0
+    if (price == 0.0) {
+        printf("0.0");
+        return;
+    }
+    char buf[64];
+    snprintf(buf, sizeof(buf), "%.2f", price);
+    size_t len = strlen(buf);
+    // 2.00 -> 2.0 ; 7.50 -> 7.5 ; 2.99 -> 2.99
+    if (len >= 4 && buf[len-3] == '.' && buf[len-2] == '0' && buf[len-1] == '0') {
+        buf[len-2] = '0';
+        buf[len-1] = '\0';
+    } else if (len >= 2 && buf[len-1] == '0') {
+        buf[len-1] = '\0';
+    }
+    printf("%s", buf);
+}
 
-    arrayToString(game->supportedLanguages, game->supportedLanguagesCount, langStr);
-    arrayToString(game->publishers, game->publishersCount, pubStr);
-    arrayToString(game->developers, game->developersCount, devStr);
-    arrayToString(game->categories, game->categoriesCount, catStr);
-    arrayToString(game->genres, game->genresCount, genStr);
-    arrayToString(game->tags, game->tagsCount, tagStr);
+/**
+ * Imprime todos os campos de um Game.
+ *
+ * @param g Ponteiro para o Game a ser impresso (não nulo).
+ */
+void imprimirJogo(const Game *g) {
+    printf("=> %d ## %s ## %s ## %d ## ",
+           g->appID, g->name, g->releaseDate, g->estimatedOwners);
+    printPrice(g->price);
+    printf(" ## [");
 
-    // Formatação inteligente do preço dentro da função printGame
-    if (game->price == (int)game->price) {
-        // Número inteiro: formato com 1 casa decimal (ex: 2.0)
-        printf("=> %d ## %s ## %s ## %d ## %.1f ## [%s] ## %d ## %.1f ## %d ## [%s] ## [%s] ## [%s] ## [%s] ## [%s] ##\n",
-               game->id, game->name, game->releaseDate, game->estimatedOwners, game->price,
-               langStr, game->metacriticScore, game->userScore, game->achievements,
-               pubStr, devStr, catStr, genStr, tagStr);
-    } else {
-        // Tem decimais: verificar se termina em 0
-        char tempPrice[20];
-        sprintf(tempPrice, "%.2f", game->price);
-        
-        // Remove zero final desnecessário (ex: 2.90 vira 2.9)
-        int len = strlen(tempPrice);
-        if (len > 2 && tempPrice[len-1] == '0' && tempPrice[len-2] != '.') {
-            tempPrice[len-1] = '\0';
-        }
-        
-        printf("=> %d ## %s ## %s ## %d ## %s ## [%s] ## %d ## %.1f ## %d ## [%s] ## [%s] ## [%s] ## [%s] ## [%s] ##\n",
-               game->id, game->name, game->releaseDate, game->estimatedOwners, tempPrice,
-               langStr, game->metacriticScore, game->userScore, game->achievements,
-               pubStr, devStr, catStr, genStr, tagStr);
+    for (int i = 0; g->supportedLanguages[i] != NULL; i++) {
+        printf("%s", g->supportedLanguages[i]);
+        if (g->supportedLanguages[i+1] != NULL) printf(", ");
+    }
+
+    printf("] ## %d ## ", g->metacriticScore);
+    printf("%.1f", g->userScore);
+    printf(" ## %d ## [", g->achievements);
+
+    for (int i = 0; g->publishers[i] != NULL; i++) {
+        printf("%s", g->publishers[i]);
+        if (g->publishers[i+1] != NULL) printf(", ");
+    }
+
+    printf("] ## [");
+    for (int i = 0; g->developers[i] != NULL; i++) {
+        printf("%s", g->developers[i]);
+        if (g->developers[i+1] != NULL) printf(", ");
+    }
+
+    printf("] ## [");
+    for (int i = 0; g->categories[i] != NULL; i++) {
+        printf("%s", g->categories[i]);
+        if (g->categories[i+1] != NULL) printf(", ");
+    }
+
+    printf("] ## [");
+    for (int i = 0; g->genres[i] != NULL; i++) {
+        printf("%s", g->genres[i]);
+        if (g->genres[i+1] != NULL) printf(", ");
+    }
+
+    printf("] ## [");
+    for (int i = 0; g->tags[i] != NULL; i++) {
+        printf("%s", g->tags[i]);
+        if (g->tags[i+1] != NULL) printf(", ");
+    }
+
+    printf("] ##\n");
+}
+
+/**
+ * Lê o arquivo CSV de jogos, cria structs Game preenchidos e os armazena no array 'jogos'.
+ *
+ * @param jogos Ponteiro para array previamente alocado de Game com capacidade maxJogos.
+ * @param maxJogos Capacidade máxima do array jogos.
+ * @param caminho Caminho do arquivo CSV a ser aberto.
+ * @return Número de registros lidos com sucesso.
+ */
+int loadCSV(Game *jogos, int maxJogos, const char *caminho) {
+    FILE *f = fopen(caminho, "r");
+    if (!f) { perror("Erro ao abrir arquivo"); return 0; }
+
+    char linha[MAX_LINE];
+    int qtd = 0;
+
+    if (!fgets(linha, sizeof(linha), f)) { fclose(f); return 0; } // pula cabeçalho
+
+    while (fgets(linha, sizeof(linha), f) != NULL && qtd < maxJogos) {
+        char *campos[14] = {0};
+        int ncampos = dividirCSV(linha, campos, 14);
+
+        Game g;
+        memset(&g, 0, sizeof(Game));
+    /* arrays serão terminadas por NULL por quebrarArray */
+
+        g.appID = (ncampos > 0) ? stringParaInt(campos[0]) : 0;
+        if (ncampos > 1) { strncpy(g.name, campos[1], MAX_STR-1); g.name[MAX_STR-1] = '\0'; trim_inplace(g.name); }
+        if (ncampos > 2) converterData(campos[2], g.releaseDate, sizeof(g.releaseDate));
+        if (ncampos > 3) g.estimatedOwners = stringParaInt(campos[3]);
+        if (ncampos > 4) g.price = stringParaDouble(campos[4]);
+    if (ncampos > 5) quebrarArray(campos[5], g.supportedLanguages, MAX_ARRAY);
+        if (ncampos > 6) g.metacriticScore = stringParaInt(campos[6]);
+        if (ncampos > 7) g.userScore = stringParaDouble(campos[7]);
+        if (ncampos > 8) g.achievements = stringParaInt(campos[8]);
+        if (ncampos > 9) quebrarArray(campos[9], g.publishers, MAX_ARRAY);
+        if (ncampos > 10) quebrarArray(campos[10], g.developers, MAX_ARRAY);
+        if (ncampos > 11) quebrarArray(campos[11], g.categories, MAX_ARRAY);
+        if (ncampos > 12) quebrarArray(campos[12], g.genres, MAX_ARRAY);
+        if (ncampos > 13) quebrarArray(campos[13], g.tags, MAX_ARRAY);
+
+        jogos[qtd++] = g;
+
+        /* libera campos lidos */
+        int tofree = (ncampos < 14) ? ncampos : 14;
+        for (int i = 0; i < tofree; i++) if (campos[i]) free(campos[i]);
+    }
+
+    fclose(f);
+    return qtd;
+}
+
+/**
+ * Libera toda a memória alocada dinamicamente nas listas internas de cada Game.
+ *
+ * @param jogos Ponteiro para o array de Game previamente preenchido.
+ * @param qtd Número de elementos válidos no array jogos.
+ */
+void liberarRecursos(Game *jogos, int qtd) {
+    for (int i = 0; i < qtd; i++) {
+        for (int j = 0; jogos[i].supportedLanguages[j] != NULL; j++) free(jogos[i].supportedLanguages[j]);
+        for (int j = 0; jogos[i].publishers[j] != NULL; j++) free(jogos[i].publishers[j]);
+        for (int j = 0; jogos[i].developers[j] != NULL; j++) free(jogos[i].developers[j]);
+        for (int j = 0; jogos[i].categories[j] != NULL; j++) free(jogos[i].categories[j]);
+        for (int j = 0; jogos[i].genres[j] != NULL; j++) free(jogos[i].genres[j]);
+        for (int j = 0; jogos[i].tags[j] != NULL; j++) free(jogos[i].tags[j]);
     }
 }
 
 
-/**
- * Função principal do programa
- * Carrega os dados dos jogos do arquivo CSV, processa entradas do usuário
- * e exibe as informações dos jogos solicitados até receber "FIM"
- * @return Código de saída do programa (0 para sucesso, 1 para erro)
- */
 int main() {
-    setlocale(LC_ALL, "");
+    /* Aloca dinamicamente no heap */
+    Game *jogos = malloc(sizeof(Game) * MAX_GAMES);
+    if (!jogos) { fprintf(stderr, "Memória insuficiente\n"); return 1; }
+    int qtd = loadCSV(jogos, MAX_GAMES, "/tmp/games.csv");
 
-    Game *games = malloc(sizeof(Game) * MAX_GAMES);
-    if (games == NULL) {
-        printf("Erro ao alocar memória\n");
-        return 1;
-    }
-
-    int gameCount = 0;
-    FILE *file = fopen("/tmp/games.csv", "r");
-    if (file == NULL) {
-        printf("Erro ao abrir arquivo\n");
-        free(games);
-        return 1;
-    }
-
-    char linha[MAX_LINE_LENGTH];
-
-    if (fgets(linha, sizeof(linha), file) == NULL) {
-        fclose(file);
-        free(games);
-        return 1;
-    }
-
-    while (fgets(linha, sizeof(linha), file) != NULL && gameCount < MAX_GAMES) {
-        linha[strcspn(linha, "\n")] = '\0';
-        initGame(&games[gameCount]);
-        lerGame(linha, &games[gameCount]);
-        gameCount++;
-    }
-
-    fclose(file);
-
-    char entrada[100];
-    while (scanf("%s", entrada) && strcmp(entrada, "FIM") != 0) {
-        int idProcurado = atoi(entrada);
-
-        for (int i = 0; i < gameCount; i++) {
-            if (games[i].id == idProcurado) {
-                printGame(&games[i]);
+    char entrada[64];
+    while (1) {
+        if (!fgets(entrada, sizeof(entrada), stdin)) break;
+        trim_inplace(entrada);
+        if (strcmp(entrada, "FIM") == 0) break;
+        int id = stringParaInt(entrada);
+        for (int i = 0; i < qtd; i++) {
+            if (jogos[i].appID == id) {
+                imprimirJogo(&jogos[i]);
                 break;
             }
         }
     }
 
-    free(games);
+    liberarRecursos(jogos, qtd);
+    free(jogos);
     return 0;
 }
