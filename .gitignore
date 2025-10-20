@@ -8,3 +8,4 @@ beecrowd/AD-HOC/1397.exe
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/tasks.json
+*.txt
