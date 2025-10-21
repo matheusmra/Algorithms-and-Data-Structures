@@ -880,91 +880,129 @@ class Celula {
 	}
 }
 
-public class Q01 {
+public class Q03 {
 
-        /**
-     * Insere o jogo em 'vetor' mantendo ordenacao ascendente por name.
-     */
-    private static void inserirOrdenado(Lista vetor, Game g) {
-        try {
-            int n = vetor.tamanho();
-            boolean inserido = false;
+   
+    private static Celula[] heap; 
+    private static int heapN;
+        private static long compCount;   
+        private static long moveCount;   
+        private static long lastSortTime; 
+
+        private static int compareGames(Game a, Game b) {
+            compCount++;
+            int ca = a.getGameEstimatedOwners();
+            int cb = b.getGameEstimatedOwners();
+            if (ca != cb) return ca - cb;
+            return a.getGameId() - b.getGameId();
+        }
+
+        
+        private static void swapHeap(int i, int j) {
+            Celula tmp = heap[i];
+            heap[i] = heap[j]; moveCount++;
+            heap[j] = tmp; moveCount++;
+
+        }
+
+        // Método público de ordenação que recebe um array 0-based de Game e retorna um array 0-based ordenado
+        private static Celula[] heapSortCelulas(Lista lista) {
+            compCount = 0;
+            moveCount = 0;
+
+            int n = lista.tamanho();
+            if (n <= 0) {
+                lastSortTime = 0;
+                return new Celula[0];
+            }
+
+            long start = System.nanoTime();
+
+            // Preparar heapArray (1-based) copiando Games da Lista para novas Celulas
+            heap = new Celula[n + 1];
             for (int i = 0; i < n; i++) {
-                Game jogo = vetor.get(i);
-                int cmp = g.getGameName().compareTo(jogo.getGameName());
-                if (cmp < 0 || (cmp == 0 && g.getGameId() < jogo.getGameId())) {
-                    vetor.inserir(g, i);
-                    inserido = true;
-                    break;
+                try {
+                    Game g = lista.get(i);
+                    heap[i + 1] = new Celula(g.clone());
+                } catch (Exception e) {
+                    heap[i + 1] = new Celula(new Game());
+                }
+                moveCount++;
+            }
+            heapN = n;
+
+            // Contrucao do heap
+            for (int tamHeap = 2; tamHeap <= heapN; tamHeap++) {
+                construirHeap(tamHeap);
+            }
+
+            // Ordenacao propriamente dita
+            int tamHeap = heapN;
+            while (tamHeap > 1) {
+                swapHeap(1, tamHeap--);
+                reconstruirHeap(tamHeap);
+            }
+
+            // Extrair resultado (0-based)
+            Celula[] resp = new Celula[n];
+            for (int i = 0; i < n; i++) {
+                resp[i] = heap[i + 1];
+                moveCount++;
+            }
+
+            long end = System.nanoTime();
+            lastSortTime = (end - start) / 1_000_000; // ms
+            return resp;
+        }
+
+        public static void construirHeap(int tamHeap) {
+            for (int i = tamHeap; i > 1; i /= 2) {
+                if (compareGames(heap[i].elemento, heap[i / 2].elemento) > 0) {
+                    swapHeap(i, i / 2);
+                } else break;
+            }
+        }
+
+
+        public static void reconstruirHeap(int tamHeap) {
+            int i = 1;
+            while (i <= (tamHeap / 2)) {
+                int filho = getMaiorFilhoHeap(i, tamHeap);
+                if (compareGames(heap[i].elemento, heap[filho].elemento) < 0) {
+                    swapHeap(i, filho);
+                    i = filho;
+                } else {
+                    i = tamHeap; // força saída
                 }
             }
-            if (!inserido) vetor.inserirFim(g);
-        } catch (Exception e) {
-            // se erro de indice, insere no fim
-            try { vetor.inserirFim(g); } catch (Exception ex) {}
         }
-    }
 
-    /**
-     * Pesquisa binária por name na Lista 'vetor'.
-     * Incrementa comps[0] a cada comparação.
-     */
-    private static boolean pesquisaBinaria(Lista vetor, String key, long[] comps) {
-        // Versão mais legível da busca binária usando nomes em português
-        if (vetor == null) return false;
-        int esquerda = 0;
-        int direita = vetor.tamanho() - 1;
-
-        // Enquanto houver intervalo válido
-        while (esquerda <= direita) {
-            int meio = (esquerda + direita) >>> 1; // ponto médio
-            Game jogoMeio;
-            try {
-                jogoMeio = vetor.get(meio);
-            } catch (Exception e) {
-                // Em caso de erro ao acessar, interrompe e retorna não encontrado
-                break;
-            }
-
-            // Conta uma comparação (entre a chave e o nome do jogo do meio)
-            comps[0]++;
-
-            // Comparação lexicográfica usando compareTo da String
-            int cmp = key.compareTo(jogoMeio.getGameName());
-
-            if (cmp == 0) {
-                // Encontrou exatamente
-                return true;
-            } else if (cmp < 0) {
-                // Chave é menor que o elemento do meio -> procurar à esquerda
-                direita = meio - 1;
+        public static int getMaiorFilhoHeap(int i, int tamHeap) {
+            int filho;
+            if (2 * i == tamHeap) {
+                filho = 2 * i;
             } else {
-                // Chave é maior -> procurar à direita
-                esquerda = meio + 1;
+                // compara os dois filhos
+                if (compareGames(heap[2 * i].elemento, heap[2 * i + 1].elemento) > 0) {
+                    filho = 2 * i;
+                } else {
+                    filho = 2 * i + 1;
+                }
+            }
+            return filho;
+        }
+
+        private static void gravar() {
+            String fileName = "848813_heapsort.txt";
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))) {
+                bw.write("848813" + "\t" + compCount + "\t" + moveCount + "\t" + lastSortTime);
+            } catch (IOException e) {
+                System.err.println("Erro ao gravar log heapsort: " + e.getMessage());
             }
         }
-        // Não encontrou
-        return false;
-    }
-
-    /**
-     * Escritor de log simples para gravação do arquivo matricula_binaria.txt
-     */
-    /**
-     * Grava o log no formato: matricula \t tempo(ms) \t comparacoes
-     */
-        private static void gravar(long tempo, long comparacoes) {
-        String fileName = "848813_binaria.txt";
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))) {
-            bw.write("848813" + "\t" + tempo + "\t" + comparacoes);
-        } catch (IOException e) {
-            System.err.println("Erro ao gravar log: " + e.getMessage());
-        }
-    }
    
     public static void main(String[] args) {
         Lista games = new Lista();
-
         // Carregar todos os jogos do CSV com codificação UTF-8
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(
@@ -981,49 +1019,32 @@ public class Q01 {
             System.err.println("Erro ao ler arquivo: " + e.getMessage());
         }
         try (Scanner scanner = new Scanner(System.in)) {
-            Lista vetor = new Lista(); // vetor de jogos inseridos
+            // Ler IDs até FIM e armazenar em lista dinâmica
+            Lista  ids = new Lista();
             String linha;
             while (!(linha = scanner.nextLine()).equals("FIM")) {
                 try {
                     int id = Integer.parseInt(linha.trim());
-                    Game g = games.buscarPorId(id);
-                    if (g != null) vetor.inserirFim(g.clone());
+                    // apenas adiciona o id; a busca pelo Game será feita após ordenar
+                    ids.inserirInicio(games.buscarPorId(id));
                 } catch (NumberFormatException ignored) {
-                } catch (Exception e) {
-                    
+                    // ignora linhas inválidas
                 }
             }
-            // Construir lista ordenada a partir de 'vetor' usando inserirOrdenado
-            Lista ordenada = new Lista();
-            try {
-                int m = vetor.tamanho();
-                for (int i = 0; i < m; i++) {
-                    Game g = vetor.get(i);
-                    inserirOrdenado(ordenada, g.clone());
+
+                // Ordenar usando heapsort por estimatedOwners (e tie-break por id)
+                Celula[] ordenados = heapSortCelulas(ids);
+
+                // Imprimir os registros ordenados
+                for (Celula c : ordenados) {
+                    if (c != null && c.elemento != null && c.elemento.getGameId() != 0) {
+                        System.out.println(c.elemento);
+                    }
                 }
-            } catch (Exception e) {
-                // se algo falhar, usa vetor como está (não ordenado)
-                ordenada = vetor;
-            }
 
-            // 2a fase: ler nomes e armazenar consultas
-            List<String> queries = new ArrayList<>();
-            while (!(linha = scanner.nextLine()).equals("FIM")) {
-                queries.add(linha);
-            }
-
-            // Executar pesquisas (todas de uma vez) e medir tempo
-            long totalcmp = 0;
-            long comeco = System.nanoTime();
-            for (String q : queries) {
-                long[] comps = new long[1];
-                boolean encontrou = pesquisaBinaria(ordenada, q, comps);
-                totalcmp += comps[0];
-                System.out.println(encontrou ? " SIM" : " NAO");
-            }
-            long fim = System.nanoTime();
-            long tempo = (fim - comeco) / 1_000_000;
-            gravar(tempo, totalcmp);
+                // Gravar log de heapsort
+                gravar();
         }
     }
 }
+
