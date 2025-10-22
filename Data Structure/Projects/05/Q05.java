@@ -889,84 +889,88 @@ class Celula {
     }
 }
 
-public class Q01 {
+public class Q05 {
+    private static long totalcmp;
+    private static long totalmv;
+    private static long tempo;
 
-    /**
-     * Insere o jogo em vetor mantendo ordenacao por name.
-     */
-    private static void inserirOrdenado(Lista vetor, Game g) {
-        try {
-            int n = vetor.tamanho();
-            boolean inserido = false;
-            for (int i = 0; i < n; i++) {
-                Game jogo = vetor.get(i);
-                int cmp = g.getGameName().compareTo(jogo.getGameName());
-                if (cmp < 0 || (cmp == 0 && g.getGameId() < jogo.getGameId())) {
-                    vetor.inserir(g, i);
-                    inserido = true;
-                    break;
+    private static Game[] mergesort(Lista lista) {
+        totalcmp = 0;
+        totalmv = 0;
+
+        int n = lista.tamanho();
+        if (n <= 0) {
+            tempo = 0;
+            return new Game[0];
+        }
+
+        long start = System.nanoTime();
+
+        Game[] arr = new Game[n];
+        for (int i = 0; i < n; i++) {
+            try {
+                arr[i] = lista.get(i).clone();
+            } catch (Exception e) {
+                arr[i] = new Game();
+            }
+            totalmv++; // copiar para array inicial conta como movimentação
+        }
+
+        Game[] aux = new Game[n];
+    mergesortRec(arr, aux, 0, n - 1);
+
+        long end = System.nanoTime();
+        tempo = (end - start) / 1_000_000; // ms
+        return arr;
+    }
+
+    private static void mergesortRec(Game[] arr, Game[] aux, int esq, int dir) {
+        if (esq >= dir) return;
+        int meio = (esq + dir) / 2;
+        mergesortRec(arr, aux, esq, meio);
+        mergesortRec(arr, aux, meio + 1, dir);
+        intercalar(arr, aux, esq, meio, dir);
+    }
+
+    private static void intercalar(Game[] arr, Game[] aux, int esq, int meio, int dir) {
+        int i = esq, j = meio + 1, k = esq;
+        while (i <= meio && j <= dir) {
+            // comparar por price
+            totalcmp++;
+            float pi = arr[i].getGamePrice();
+            float pj = arr[j].getGamePrice();
+            if (pi < pj) {
+                aux[k++] = arr[i++]; totalmv++;
+            } else if (pi > pj) {
+                aux[k++] = arr[j++]; totalmv++;
+            } else {
+                // preços iguais, desempate por id
+                totalcmp++; // contar comparacao de id
+                if (arr[i].getGameId() <= arr[j].getGameId()) {
+                    aux[k++] = arr[i++]; totalmv++;
+                } else {
+                    aux[k++] = arr[j++]; totalmv++;
                 }
             }
-            if (!inserido)
-                vetor.inserirFim(g);
-        } catch (Exception e) {
-            // se erro de indice, insere no fim
-            try {
-                vetor.inserirFim(g);
-            } catch (Exception ex) {
-            }
         }
+        while (i <= meio) { aux[k++] = arr[i++]; totalmv++; }
+        while (j <= dir) { aux[k++] = arr[j++]; totalmv++; }
+
+        // copiar de volta para arr
+        for (int t = esq; t <= dir; t++) { arr[t] = aux[t]; totalmv++; }
     }
 
-    /**
-     * Pesquisa binária por name na Lista '.
-     * Incrementa comps[0] a cada comparação.
-     */
-    private static boolean pesquisaBinaria(Lista vetor, String key, long[] comps) {
-        if (vetor == null)
-            return false;
-        int esquerda = 0;
-        int direita = vetor.tamanho() - 1;
-
-        while (esquerda <= direita) {
-            int meio = (esquerda + direita) / 2;
-            Game jogoMeio;
-            try {
-                jogoMeio = vetor.get(meio);
-            } catch (Exception e) {
-                break;
-            }
-            // Conta uma comparação 
-            comps[0]++;
-            // Comparação lexicográfica usando compareTo da String
-            int cmp = key.compareTo(jogoMeio.getGameName());
-
-            if (cmp == 0) {
-                // Encontrou exatamente
-                return true;
-            } else if (cmp < 0) {
-                
-                direita = meio - 1;
-            } else {
-                esquerda = meio + 1;
-            }
-        }
-        // Não encontrou
-        return false;
-    }
-
-    private static void gravar(long tempo, long comparacoes) {
-        String fileName = "848813_binaria.txt";
+    private static void gravar() {
+        String fileName = "848813_mergesort.txt";
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))) {
-            bw.write("848813" + "\t" + tempo + "\t" + comparacoes);
+            bw.write("848813" + "\t" + totalcmp + "\t" + totalmv + "\t" + tempo);
         } catch (IOException e) {
-            System.err.println("Erro ao gravar log: " + e.getMessage());
+            System.err.println("Erro ao gravar log mergesort: " + e.getMessage());
         }
     }
 
     public static void main(String[] args) {
         Lista games = new Lista();
-
         // Carregar todos os jogos do CSV com codificação UTF-8
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(
@@ -983,49 +987,32 @@ public class Q01 {
             System.err.println("Erro ao ler arquivo: " + e.getMessage());
         }
         try (Scanner scanner = new Scanner(System.in)) {
-            Lista vetor = new Lista(); // vetor de jogos inseridos
+            Lista ids = new Lista();
             String linha;
             while (!(linha = scanner.nextLine()).equals("FIM")) {
                 try {
                     int id = Integer.parseInt(linha.trim());
-                    Game g = games.buscarPorId(id);
-                    if (g != null)
-                        vetor.inserirFim(g.clone());
+                    ids.inserirInicio(games.buscarPorId(id));
                 } catch (NumberFormatException ignored) {
-                } catch (Exception e) {
-
                 }
             }
-            // Construir lista ordenada a partir de 'vetor' usando inserirOrdenado
-            Lista ordenada = new Lista();
-            try {
-                int m = vetor.tamanho();
-                for (int i = 0; i < m; i++) {
-                    Game g = vetor.get(i);
-                    inserirOrdenado(ordenada, g.clone());
-                }
-            } catch (Exception e) {
-                ordenada = vetor;
+            Game[] ordenados = mergesort(ids);
+            // Imprimir os registros ordenados
+            System.out.println("| 5 preços mais caros |");
+            int n = ordenados.length;
+            for (int i = n - 1; i >= n - 5 && i >= 0; i--) {
+                Game g = ordenados[i];
+                System.out.println(g);
             }
-
-            // Leitura de nomes
-            List<String> queries = new ArrayList<>();
-            while (!(linha = scanner.nextLine()).equals("FIM")) {
-                queries.add(linha);
+            System.out.println();
+            System.out.println("| 5 preços mais baratos |");
+            for (int i = 0; i < 5 && i < n; i++) {
+                Game g = ordenados[i];
+                System.out.println(g);
             }
-
-            // Executar pesquisas
-            long totalcmp = 0;
-            long comeco = System.nanoTime();
-            for (String q : queries) {
-                long[] comps = new long[1];
-                boolean encontrou = pesquisaBinaria(ordenada, q, comps);
-                totalcmp += comps[0];
-                System.out.println(encontrou ? " SIM" : " NAO");
-            }
-            long fim = System.nanoTime();
-            long tempo = (fim - comeco) / 1_000_000;
-            gravar(tempo, totalcmp);
+            // Gravar log de mergesort
+            gravar();
         }
     }
 }
+

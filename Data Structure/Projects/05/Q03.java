@@ -645,182 +645,185 @@ class Game {
  * @version 2 01/2015
  */
 class Lista {
-	private Celula primeiro;
-	private Celula ultimo;
+    private Celula primeiro;
+    private Celula ultimo;
 
+    /**
+     * Construtor da classe que cria uma lista sem elementos (somente no cabeca).
+     */
+    public Lista() {
+        primeiro = new Celula();
+        ultimo = primeiro;
+    }
 
-	/**
-	 * Construtor da classe que cria uma lista sem elementos (somente no cabeca).
-	 */
-	public Lista() {
-		primeiro = new Celula();
-		ultimo = primeiro;
-	}
+    /**
+     * Insere um elemento na primeira posicao da lista.
+     * 
+     * @param x int elemento a ser inserido.
+     */
+    public void inserirInicio(Game x) {
+        Celula tmp = new Celula(x);
+        tmp.prox = primeiro.prox;
+        primeiro.prox = tmp;
+        if (primeiro == ultimo) {
+            ultimo = tmp;
+        }
+        tmp = null;
+    }
 
+    /**
+     * Insere um elemento na ultima posicao da lista.
+     * 
+     * @param x int elemento a ser inserido.
+     */
+    public void inserirFim(Game x) {
+        ultimo.prox = new Celula(x);
+        ultimo = ultimo.prox;
+    }
 
-	/**
-	 * Insere um elemento na primeira posicao da lista.
-    * @param x int elemento a ser inserido.
-	 */
-	public void inserirInicio(Game x) {
-		Celula tmp = new Celula(x);
-      tmp.prox = primeiro.prox;
-		primeiro.prox = tmp;
-		if (primeiro == ultimo) {                 
-			ultimo = tmp;
-		}
-      tmp = null;
-	}
+    /**
+     * Remove um elemento da primeira posicao da lista.
+     * 
+     * @return resp int elemento a ser removido.
+     * @throws Exception Se a lista nao contiver elementos.
+     */
+    public Game removerInicio() throws Exception {
+        if (primeiro == ultimo) {
+            throw new Exception("Erro ao remover (vazia)!");
+        }
 
+        Celula tmp = primeiro;
+        primeiro = primeiro.prox;
+        Game resp = primeiro.elemento;
+        tmp.prox = null;
+        tmp = null;
+        return resp;
+    }
 
-	/**
-	 * Insere um elemento na ultima posicao da lista.
-    * @param x int elemento a ser inserido.
-	 */
-	public void inserirFim(Game x) {
-		ultimo.prox = new Celula(x);
-		ultimo = ultimo.prox;
-	}
+    /**
+     * Remove um elemento da ultima posicao da lista.
+     * 
+     * @return resp int elemento a ser removido.
+     * @throws Exception Se a lista nao contiver elementos.
+     */
+    public Game removerFim() throws Exception {
+        if (primeiro == ultimo) {
+            throw new Exception("Erro ao remover (vazia)!");
+        }
 
+        // Caminhar ate a penultima celula:
+        Celula i;
+        for (i = primeiro; i.prox != ultimo; i = i.prox)
+            ;
 
-	/**
-	 * Remove um elemento da primeira posicao da lista.
-    * @return resp int elemento a ser removido.
-	 * @throws Exception Se a lista nao contiver elementos.
-	 */
-	public Game removerInicio() throws Exception {
-		if (primeiro == ultimo) {
-			throw new Exception("Erro ao remover (vazia)!");
-		}
+        Game resp = ultimo.elemento;
+        ultimo = i;
+        i = ultimo.prox = null;
 
-      Celula tmp = primeiro;
-		primeiro = primeiro.prox;
-		Game resp = primeiro.elemento;
-      tmp.prox = null;
-      tmp = null;
-		return resp;
-	}
+        return resp;
+    }
 
+    /**
+     * Insere um elemento em uma posicao especifica considerando que o
+     * primeiro elemento valido esta na posicao 0.
+     * 
+     * @param x   int elemento a ser inserido.
+     * @param pos int posicao da insercao.
+     * @throws Exception Se <code>posicao</code> invalida.
+     */
+    public void inserir(Game x, int pos) throws Exception {
 
-	/**
-	 * Remove um elemento da ultima posicao da lista.
-    * @return resp int elemento a ser removido.
-	 * @throws Exception Se a lista nao contiver elementos.
-	 */
-	public Game removerFim() throws Exception {
-		if (primeiro == ultimo) {
-			throw new Exception("Erro ao remover (vazia)!");
-		} 
+        int tamanho = tamanho();
 
-		// Caminhar ate a penultima celula:
-      Celula i;
-      for(i = primeiro; i.prox != ultimo; i = i.prox);
+        if (pos < 0 || pos > tamanho) {
+            throw new Exception("Erro ao inserir posicao (" + pos + " / tamanho = " + tamanho + ") invalida!");
+        } else if (pos == 0) {
+            inserirInicio(x);
+        } else if (pos == tamanho) {
+            inserirFim(x);
+        } else {
+            // Caminhar ate a posicao anterior a insercao
+            Celula i = primeiro;
+            for (int j = 0; j < pos; j++, i = i.prox)
+                ;
 
-      Game resp = ultimo.elemento; 
-      ultimo = i; 
-      i = ultimo.prox = null;
-      
-		return resp;
-	}
+            Celula tmp = new Celula(x);
+            tmp.prox = i.prox;
+            i.prox = tmp;
+            tmp = i = null;
+        }
+    }
 
+    /**
+     * Remove um elemento de uma posicao especifica da lista
+     * considerando que o primeiro elemento valido esta na posicao 0.
+     * 
+     * @param posicao Meio da remocao.
+     * @return resp int elemento a ser removido.
+     * @throws Exception Se <code>posicao</code> invalida.
+     */
+    public Game remover(int pos) throws Exception {
+        Game resp;
+        int tamanho = tamanho();
 
-	/**
-    * Insere um elemento em uma posicao especifica considerando que o 
-    * primeiro elemento valido esta na posicao 0.
-    * @param x int elemento a ser inserido.
-	 * @param pos int posicao da insercao.
-	 * @throws Exception Se <code>posicao</code> invalida.
-	 */
-   public void inserir(Game x, int pos) throws Exception {
+        if (primeiro == ultimo) {
+            throw new Exception("Erro ao remover (vazia)!");
 
-      int tamanho = tamanho();
+        } else if (pos < 0 || pos >= tamanho) {
+            throw new Exception("Erro ao remover (posicao " + pos + " / " + tamanho + " invalida!");
+        } else if (pos == 0) {
+            resp = removerInicio();
+        } else if (pos == tamanho - 1) {
+            resp = removerFim();
+        } else {
+            // Caminhar ate a posicao anterior a insercao
+            Celula i = primeiro;
+            for (int j = 0; j < pos; j++, i = i.prox)
+                ;
 
-      if(pos < 0 || pos > tamanho){
-			throw new Exception("Erro ao inserir posicao (" + pos + " / tamanho = " + tamanho + ") invalida!");
-      } else if (pos == 0){
-         inserirInicio(x);
-      } else if (pos == tamanho){
-         inserirFim(x);
-      } else {
-		   // Caminhar ate a posicao anterior a insercao
-         Celula i = primeiro;
-         for(int j = 0; j < pos; j++, i = i.prox);
-		
-         Celula tmp = new Celula(x);
-         tmp.prox = i.prox;
-         i.prox = tmp;
-         tmp = i = null;
-      }
-   }
+            Celula tmp = i.prox;
+            resp = tmp.elemento;
+            i.prox = tmp.prox;
+            tmp.prox = null;
+            i = tmp = null;
+        }
 
+        return resp;
+    }
 
-	/**
-    * Remove um elemento de uma posicao especifica da lista
-    * considerando que o primeiro elemento valido esta na posicao 0.
-	 * @param posicao Meio da remocao.
-    * @return resp int elemento a ser removido.
-	 * @throws Exception Se <code>posicao</code> invalida.
-	 */
-	public Game remover(int pos) throws Exception {
-      Game resp;
-      int tamanho = tamanho();
+    /**
+     * Mostra os elementos da lista separados por espacos.
+     */
+    public void mostrar() {
+        System.out.print("[ ");
+        for (Celula i = primeiro.prox; i != null; i = i.prox) {
+            System.out.print(i.elemento + " ");
+        }
+        System.out.println("] ");
+    }
 
-		if (primeiro == ultimo){
-			throw new Exception("Erro ao remover (vazia)!");
-
-      } else if(pos < 0 || pos >= tamanho){
-			throw new Exception("Erro ao remover (posicao " + pos + " / " + tamanho + " invalida!");
-      } else if (pos == 0){
-         resp = removerInicio();
-      } else if (pos == tamanho - 1){
-         resp = removerFim();
-      } else {
-		   // Caminhar ate a posicao anterior a insercao
-         Celula i = primeiro;
-         for(int j = 0; j < pos; j++, i = i.prox);
-		
-         Celula tmp = i.prox;
-         resp = tmp.elemento;
-         i.prox = tmp.prox;
-         tmp.prox = null;
-         i = tmp = null;
-      }
-
-		return resp;
-	}
-
-	/**
-	 * Mostra os elementos da lista separados por espacos.
-	 */
-	public void mostrar() {
-		System.out.print("[ ");
-		for (Celula i = primeiro.prox; i != null; i = i.prox) {
-			System.out.print(i.elemento + " ");
-		}
-		System.out.println("] ");
-	}
-
-	/**
-	 * Procura um elemento e retorna se ele existe.
-	 * @param x Elemento a pesquisar.
-	 * @return <code>true</code> se o elemento existir,
-	 * <code>false</code> em caso contrario.
-	 */
-	public boolean pesquisar(Game x) {
-		boolean resp = false;
-		for (Celula i = primeiro.prox; i != null; i = i.prox) {
-         if(i.elemento == x){
-            resp = true;
-            i = ultimo;
-         }
-		}
-		return resp;
-	}
+    /**
+     * Procura um elemento e retorna se ele existe.
+     * 
+     * @param x Elemento a pesquisar.
+     * @return <code>true</code> se o elemento existir,
+     *         <code>false</code> em caso contrario.
+     */
+    public boolean pesquisar(Game x) {
+        boolean resp = false;
+        for (Celula i = primeiro.prox; i != null; i = i.prox) {
+            if (i.elemento == x) {
+                resp = true;
+                i = ultimo;
+            }
+        }
+        return resp;
+    }
 
     public Game buscarPorNome(String nome) {
         Game resp = null;
         for (Celula i = primeiro.prox; i != null; i = i.prox) {
-            if(i.elemento.getGameName().equals(nome)){
+            if (i.elemento.getGameName().equals(nome)) {
                 resp = i.elemento;
                 i = ultimo;
             }
@@ -828,179 +831,186 @@ class Lista {
         return resp;
     }
 
-        /**
-         * Retorna o elemento na posicao pos (0-based).
-         */
-        public Game get(int pos) throws Exception {
-            if (pos < 0 || pos >= tamanho()) throw new Exception("Posicao invalida");
-            Celula i = primeiro.prox;
-            for (int j = 0; j < pos; j++, i = i.prox);
-            return i.elemento;
-        }
+    /**
+     * Retorna o elemento na posicao pos (0-based).
+     */
+    public Game get(int pos) throws Exception {
+        if (pos < 0 || pos >= tamanho())
+            throw new Exception("Posicao invalida");
+        Celula i = primeiro.prox;
+        for (int j = 0; j < pos; j++, i = i.prox)
+            ;
+        return i.elemento;
+    }
 
-        /**
-         * Busca por ID na lista e retorna o Game se encontrado, ou null.
-         */
-        public Game buscarPorId(int id) {
-            for (Celula i = primeiro.prox; i != null; i = i.prox) {
-                if (i.elemento.getGameId() == id) return i.elemento;
-            }
-            return null;
+    /**
+     * Busca por ID na lista e retorna o Game se encontrado, ou null.
+     */
+    public Game buscarPorId(int id) {
+        for (Celula i = primeiro.prox; i != null; i = i.prox) {
+            if (i.elemento.getGameId() == id)
+                return i.elemento;
         }
+        return null;
+    }
 
-	/**
-	 * Calcula e retorna o tamanho, em numero de elementos, da lista.
-	 * @return resp int tamanho
-	 */
-   public int tamanho() {
-      int tamanho = 0; 
-      for(Celula i = primeiro; i != ultimo; i = i.prox, tamanho++);
-      return tamanho;
-   }
+    /**
+     * Calcula e retorna o tamanho, em numero de elementos, da lista.
+     * 
+     * @return resp int tamanho
+     */
+    public int tamanho() {
+        int tamanho = 0;
+        for (Celula i = primeiro; i != ultimo; i = i.prox, tamanho++)
+            ;
+        return tamanho;
+    }
 }
 
 class Celula {
-	public Game elemento; // Elemento inserido na celula.
-	public Celula prox; // Aponta a celula prox.
+    public Game elemento; // Elemento inserido na celula.
+    public Celula prox; // Aponta a celula prox.
 
-	/**
-	 * Construtor da classe.
-	 */
-	public Celula() {
-		this(new Game());
-	}
+    /**
+     * Construtor da classe.
+     */
+    public Celula() {
+        this(new Game());
+    }
 
-	/**
-	 * Construtor da classe.
-	 * @param elemento Game inserido na celula.
-	 */
-	public Celula(Game elemento) {
-		this.elemento = elemento;
-		this.prox = null;
-	}
+    /**
+     * Construtor da classe.
+     * 
+     * @param elemento Game inserido na celula.
+     */
+    public Celula(Game elemento) {
+        this.elemento = elemento;
+        this.prox = null;
+    }
 }
 
 public class Q03 {
-
-   
-    private static Celula[] heap; 
+    private static Celula[] heap;
     private static int heapN;
-        private static long compCount;   
-        private static long moveCount;   
-        private static long lastSortTime; 
+    private static long totalcmp;
+    private static long totalmv;
+    private static long tempo;
 
-        private static int compareGames(Game a, Game b) {
-            compCount++;
-            int ca = a.getGameEstimatedOwners();
-            int cb = b.getGameEstimatedOwners();
-            if (ca != cb) return ca - cb;
-            return a.getGameId() - b.getGameId();
+    private static int comparar(Game a, Game b) {
+        totalcmp++;
+        int ca = a.getGameEstimatedOwners();
+        int cb = b.getGameEstimatedOwners();
+        if (ca != cb)
+            return ca - cb;
+        return a.getGameId() - b.getGameId();
+    }
+
+    private static void swapHeap(int i, int j) {
+        Celula tmp = heap[i];
+        heap[i] = heap[j];
+        totalmv++;
+        heap[j] = tmp;
+        totalmv++;
+
+    }
+
+    // Método público de ordenação que recebe um array 0-based de Game e retorna um
+    // array 0-based ordenado
+    private static Celula[] heapSortCelulas(Lista lista) {
+        totalcmp = 0;
+        totalmv = 0;
+
+        int n = lista.tamanho();
+        if (n <= 0) {
+            tempo = 0;
+            return new Celula[0];
         }
 
-        
-        private static void swapHeap(int i, int j) {
-            Celula tmp = heap[i];
-            heap[i] = heap[j]; moveCount++;
-            heap[j] = tmp; moveCount++;
+        long start = System.nanoTime();
 
+        // Preparar heapArray copiando Games da Lista para novas Celulas
+        heap = new Celula[n + 1];
+        for (int i = 0; i < n; i++) {
+            try {
+                Game g = lista.get(i);
+                heap[i + 1] = new Celula(g.clone());
+            } catch (Exception e) {
+                heap[i + 1] = new Celula(new Game());
+            }
+            totalmv++;
+        }
+        heapN = n;
+
+        // Contrucao do heap
+        for (int tamHeap = 2; tamHeap <= heapN; tamHeap++) {
+            construirHeap(tamHeap);
         }
 
-        // Método público de ordenação que recebe um array 0-based de Game e retorna um array 0-based ordenado
-        private static Celula[] heapSortCelulas(Lista lista) {
-            compCount = 0;
-            moveCount = 0;
-
-            int n = lista.tamanho();
-            if (n <= 0) {
-                lastSortTime = 0;
-                return new Celula[0];
-            }
-
-            long start = System.nanoTime();
-
-            // Preparar heapArray (1-based) copiando Games da Lista para novas Celulas
-            heap = new Celula[n + 1];
-            for (int i = 0; i < n; i++) {
-                try {
-                    Game g = lista.get(i);
-                    heap[i + 1] = new Celula(g.clone());
-                } catch (Exception e) {
-                    heap[i + 1] = new Celula(new Game());
-                }
-                moveCount++;
-            }
-            heapN = n;
-
-            // Contrucao do heap
-            for (int tamHeap = 2; tamHeap <= heapN; tamHeap++) {
-                construirHeap(tamHeap);
-            }
-
-            // Ordenacao propriamente dita
-            int tamHeap = heapN;
-            while (tamHeap > 1) {
-                swapHeap(1, tamHeap--);
-                reconstruirHeap(tamHeap);
-            }
-
-            // Extrair resultado (0-based)
-            Celula[] resp = new Celula[n];
-            for (int i = 0; i < n; i++) {
-                resp[i] = heap[i + 1];
-                moveCount++;
-            }
-
-            long end = System.nanoTime();
-            lastSortTime = (end - start) / 1_000_000; // ms
-            return resp;
+        // Ordenacao propriamente dita
+        int tamHeap = heapN;
+        while (tamHeap > 1) {
+            swapHeap(1, tamHeap--);
+            reconstruirHeap(tamHeap);
         }
 
-        public static void construirHeap(int tamHeap) {
-            for (int i = tamHeap; i > 1; i /= 2) {
-                if (compareGames(heap[i].elemento, heap[i / 2].elemento) > 0) {
-                    swapHeap(i, i / 2);
-                } else break;
-            }
+        // Extrair resultado
+        Celula[] resp = new Celula[n];
+        for (int i = 0; i < n; i++) {
+            resp[i] = heap[i + 1];
+            totalmv++;
         }
 
+        long end = System.nanoTime();
+        tempo = (end - start) / 1_000_000; // ms
+        return resp;
+    }
 
-        public static void reconstruirHeap(int tamHeap) {
-            int i = 1;
-            while (i <= (tamHeap / 2)) {
-                int filho = getMaiorFilhoHeap(i, tamHeap);
-                if (compareGames(heap[i].elemento, heap[filho].elemento) < 0) {
-                    swapHeap(i, filho);
-                    i = filho;
-                } else {
-                    i = tamHeap; // força saída
-                }
+    public static void construirHeap(int tamHeap) {
+        for (int i = tamHeap; i > 1; i /= 2) {
+            if (comparar(heap[i].elemento, heap[i / 2].elemento) > 0) {
+                swapHeap(i, i / 2);
+            } else
+                break;
+        }
+    }
+
+    public static void reconstruirHeap(int tamHeap) {
+        int i = 1;
+        while (i <= (tamHeap / 2)) {
+            int filho = getMaiorFilhoHeap(i, tamHeap);
+            if (comparar(heap[i].elemento, heap[filho].elemento) < 0) {
+                swapHeap(i, filho);
+                i = filho;
+            } else {
+                i = tamHeap; // força saída
             }
         }
+    }
 
-        public static int getMaiorFilhoHeap(int i, int tamHeap) {
-            int filho;
-            if (2 * i == tamHeap) {
+    public static int getMaiorFilhoHeap(int i, int tamHeap) {
+        int filho;
+        if (2 * i == tamHeap) {
+            filho = 2 * i;
+        } else {
+            // compara os dois filhos
+            if (comparar(heap[2 * i].elemento, heap[2 * i + 1].elemento) > 0) {
                 filho = 2 * i;
             } else {
-                // compara os dois filhos
-                if (compareGames(heap[2 * i].elemento, heap[2 * i + 1].elemento) > 0) {
-                    filho = 2 * i;
-                } else {
-                    filho = 2 * i + 1;
-                }
+                filho = 2 * i + 1;
             }
-            return filho;
         }
+        return filho;
+    }
 
-        private static void gravar() {
-            String fileName = "848813_heapsort.txt";
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))) {
-                bw.write("848813" + "\t" + compCount + "\t" + moveCount + "\t" + lastSortTime);
-            } catch (IOException e) {
-                System.err.println("Erro ao gravar log heapsort: " + e.getMessage());
-            }
+    private static void gravar() {
+        String fileName = "848813_heapsort.txt";
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))) {
+            bw.write("848813" + "\t" + totalcmp + "\t" + totalmv + "\t" + tempo);
+        } catch (IOException e) {
+            System.err.println("Erro ao gravar log heapsort: " + e.getMessage());
         }
-   
+    }
+
     public static void main(String[] args) {
         Lista games = new Lista();
         // Carregar todos os jogos do CSV com codificação UTF-8
@@ -1019,32 +1029,24 @@ public class Q03 {
             System.err.println("Erro ao ler arquivo: " + e.getMessage());
         }
         try (Scanner scanner = new Scanner(System.in)) {
-            // Ler IDs até FIM e armazenar em lista dinâmica
-            Lista  ids = new Lista();
+            Lista ids = new Lista();
             String linha;
             while (!(linha = scanner.nextLine()).equals("FIM")) {
                 try {
                     int id = Integer.parseInt(linha.trim());
-                    // apenas adiciona o id; a busca pelo Game será feita após ordenar
                     ids.inserirInicio(games.buscarPorId(id));
                 } catch (NumberFormatException ignored) {
-                    // ignora linhas inválidas
                 }
             }
-
-                // Ordenar usando heapsort por estimatedOwners (e tie-break por id)
-                Celula[] ordenados = heapSortCelulas(ids);
-
-                // Imprimir os registros ordenados
-                for (Celula c : ordenados) {
-                    if (c != null && c.elemento != null && c.elemento.getGameId() != 0) {
-                        System.out.println(c.elemento);
-                    }
+            Celula[] ordenados = heapSortCelulas(ids);
+            // Imprimir os registros ordenados
+            for (Celula c : ordenados) {
+                if (c != null && c.elemento != null && c.elemento.getGameId() != 0) {
+                    System.out.println(c.elemento);
                 }
-
-                // Gravar log de heapsort
-                gravar();
+            }
+            // Gravar log de heapsort
+            gravar();
         }
     }
 }
-
