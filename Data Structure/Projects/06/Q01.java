@@ -803,6 +803,21 @@ class Lista {
     }
 
     /**
+     * Imprime cada elemento da lista em sua própria linha usando toString()
+     */
+    public void mostrarTodos() {
+        int indice = 0;
+        for (Celula i = primeiro.prox; i != null; i = i.prox, indice++) {
+            String texto = i.elemento.toString();
+            // remover prefixo ">= " do toString() original para evitar duplicação
+            if (texto.startsWith("=> ")) {
+                texto = texto.substring(3);
+            }
+            System.out.println("[" + indice + "] => " + texto);
+        }
+    }
+
+    /**
      * Procura um elemento e retorna se ele existe.
      * 
      * @param x Elemento a pesquisar.
@@ -889,130 +904,166 @@ class Celula {
     }
 }
 
-public class Q05 {
-    private static long totalcmp;
-    private static long totalmv;
-    private static long tempo;
-
-    private static Game[] mergesort(Lista lista) {
-        totalcmp = 0;
-        totalmv = 0;
-
-        int n = lista.tamanho();
-        if (n <= 0) {
-            tempo = 0;
-            return new Game[0];
-        }
-
-        long start = System.nanoTime();
-
-        Game[] arr = new Game[n];
-        for (int i = 0; i < n; i++) {
-            try {
-                arr[i] = lista.get(i).clone();
-            } catch (Exception e) {
-                arr[i] = new Game();
-            }
-            totalmv++; // copiar para array inicial conta como movimentação
-        }
-
-        Game[] aux = new Game[n];
-    mergesortRec(arr, aux, 0, n - 1);
-
-        long end = System.nanoTime();
-        tempo = (end - start) / 1_000_000; // ms
-        return arr;
-    }
-
-    private static void mergesortRec(Game[] arr, Game[] aux, int esq, int dir) {
-        if (esq >= dir) return;
-        int meio = (esq + dir) / 2;
-        mergesortRec(arr, aux, esq, meio);
-        mergesortRec(arr, aux, meio + 1, dir);
-        intercalar(arr, aux, esq, meio, dir);
-    }
-
-    private static void intercalar(Game[] arr, Game[] aux, int esq, int meio, int dir) {
-        int i = esq, j = meio + 1, k = esq;
-        while (i <= meio && j <= dir) {
-            // comparar por price
-            totalcmp++;
-            float pi = arr[i].getGamePrice();
-            float pj = arr[j].getGamePrice();
-            if (pi < pj) {
-                aux[k++] = arr[i++]; totalmv++;
-            } else if (pi > pj) {
-                aux[k++] = arr[j++]; totalmv++;
-            } else {
-                // preços iguais, desempate por id
-                totalcmp++; // contar comparacao de id
-                if (arr[i].getGameId() <= arr[j].getGameId()) {
-                    aux[k++] = arr[i++]; totalmv++;
-                } else {
-                    aux[k++] = arr[j++]; totalmv++;
-                }
-            }
-        }
-        while (i <= meio) { aux[k++] = arr[i++]; totalmv++; }
-        while (j <= dir) { aux[k++] = arr[j++]; totalmv++; }
-
-        // copiar de volta para arr
-        for (int t = esq; t <= dir; t++) { arr[t] = aux[t]; totalmv++; }
-    }
-
-    private static void gravar() {
-        String fileName = "848813_mergesort.txt";
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))) {
-            bw.write("848813" + "\t" + totalcmp + "\t" + totalmv + "\t" + tempo);
-        } catch (IOException e) {
-            System.err.println("Erro ao gravar log mergesort: " + e.getMessage());
-        }
-    }
+public class Q01 {
 
     public static void main(String[] args) {
         Lista games = new Lista();
+
         // Carregar todos os jogos do CSV com codificação UTF-8
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(
-                    new FileInputStream("C:\\Users\\mathe\\OneDrive\\Documentos\\Faculdade\\AEDS2\\Data Structure\\Projects\\04\\games.csv"),
+                    new FileInputStream("/tmp/games.csv"),
                     "UTF-8"));
             String linha = br.readLine(); // Pular cabeçalho
             while ((linha = br.readLine()) != null) {
-                Game game = new Game();
-                game.ler(linha);
-                games.inserirInicio(game);
+                Game jogo = new Game();
+                jogo.ler(linha);
+                games.inserirInicio(jogo);
             }
             br.close();
         } catch (IOException e) {
             System.err.println("Erro ao ler arquivo: " + e.getMessage());
         }
         try (Scanner scanner = new Scanner(System.in)) {
-            Lista ids = new Lista();
+            Lista lista = new Lista(); // vetor de jogos inseridos
+
+            //  ids até "FIM"
             String linha;
-            while (!(linha = scanner.nextLine()).equals("FIM")) {
+            while (true) {
+                if (!scanner.hasNextLine()) break;
+                linha = scanner.nextLine().trim();
+                if (linha.equals("FIM")) break;
+                if (linha.isEmpty()) continue;
                 try {
-                    int id = Integer.parseInt(linha.trim());
-                    ids.inserirInicio(games.buscarPorId(id));
+                    int id = Integer.parseInt(linha);
+                    Game g = games.buscarPorId(id);
+                    if (g != null) lista.inserirFim(g.clone());
                 } catch (NumberFormatException ignored) {
+                    // ignorar linhas inválidas
                 }
             }
-            Game[] ordenados = mergesort(ids);
-            // Imprimir os registros ordenados
-            System.out.println("| 5 preços mais caros |");
-            int n = ordenados.length;
-            for (int i = n - 1; i >= n - 5 && i >= 0; i--) {
-                Game g = ordenados[i];
-                System.out.println(g);
+
+            //numero de operacoes 
+            int n = 0;
+            if (scanner.hasNextLine()) {
+                String nline = scanner.nextLine().trim();
+                try {
+                    n = Integer.parseInt(nline);
+                } catch (NumberFormatException e) {
+                    n = 0;
+                }
             }
-            System.out.println();
-            System.out.println("| 5 preços mais baratos |");
-            for (int i = 0; i < 5 && i < n; i++) {
-                Game g = ordenados[i];
-                System.out.println(g);
+
+            int processados = 0;
+            while (processados < n && scanner.hasNextLine()) {
+                String comando = scanner.nextLine().trim();
+                if (comando.isEmpty()) {
+                    continue;
+                }
+
+                processados++;
+
+                String[] partes = comando.split(" ");
+                String operacao = partes[0];
+
+                try {
+                    switch (operacao) {
+                        case "II": { // inserir inicio: II <id>
+                            if (partes.length >= 2) {
+                                try {
+                                    int id = Integer.parseInt(partes[1]);
+                                    Game g = games.buscarPorId(id);
+                                    if (g != null)
+                                        lista.inserirInicio(g.clone());
+                                } catch (NumberFormatException ex) {
+                                    System.err.println("Parametro invalido para II: " + comando);
+                                }
+                            } else {
+                                System.err.println("II necessita de 1 argumento: " + comando);
+                            }
+                            break;
+                        }
+                        case "IF": { // inserir fim: IF <id>
+                            if (partes.length >= 2) {
+                                try {
+                                    int id = Integer.parseInt(partes[1]);
+                                    Game g = games.buscarPorId(id);
+                                    if (g != null)
+                                        lista.inserirFim(g.clone());
+                                } catch (NumberFormatException ex) {
+                                    System.err.println("Parametro invalido para IF: " + comando);
+                                }
+                            } else {
+                                System.err.println("IF necessita de 1 argumento: " + comando);
+                            }
+                            break;
+                        }
+                        case "I*": { // inserir em pos: I* <pos> <id>
+                            if (partes.length >= 3) {
+                                try {
+                                    int pos = Integer.parseInt(partes[1]);
+                                    int id = Integer.parseInt(partes[2]);
+                                    Game g = games.buscarPorId(id);
+                                    if (g != null)
+                                        lista.inserir(g.clone(), pos);
+                                } catch (NumberFormatException ex) {
+                                    System.err.println("Parametros invalidos para I*: " + comando);
+                                } catch (Exception ex) {
+                                    System.err.println("Erro ao inserir com I*: " + ex.getMessage());
+                                }
+                            } else {
+                                System.err.println("I* necessita de 2 argumentos: " + comando);
+                            }
+                            break;
+                        }
+                        case "RI": { // remover inicio
+                            try {
+                                Game rem = lista.removerInicio();
+                                System.out.println("(R) " + rem.getGameName());
+                            } catch (Exception ex) {
+                                System.err.println("Erro em RI (lista vazia?): " + ex.getMessage());
+                            }
+                            break;
+                        }
+                        case "RF": { // remover fim
+                            try {
+                                Game rem = lista.removerFim();
+                                System.out.println("(R) " + rem.getGameName());
+                            } catch (Exception ex) {
+                                System.err.println("Erro em RF (lista vazia?): " + ex.getMessage());
+                            }
+                            break;
+                        }
+                        case "R*": { // remover pos: R* <pos>
+                            if (partes.length >= 2) {
+                                try {
+                                    int pos = Integer.parseInt(partes[1]);
+                                    Game rem = lista.remover(pos);
+                                    System.out.println("(R) " + rem.getGameName());
+                                } catch (NumberFormatException ex) {
+                                    System.err.println("Parametro invalido para R*: " + comando);
+                                } catch (Exception ex) {
+                                    System.err.println("Erro ao remover com R*: " + ex.getMessage());
+                                }
+                            } else {
+                                System.err.println("R* necessita de 1 argumento: " + comando);
+                            }
+                            break;
+                        }
+                        default:
+                            System.err.println("Comando desconhecido: " + comando);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Erro ao processar comando '" + comando + "': " + e.getMessage());
+                }
             }
-            // Gravar log de mergesort
-            gravar();
+
+
+            // Mostrar resultados finais
+            lista.mostrarTodos();
+
+        } catch (Exception e) {
+            System.err.println("Erro: " + e.getMessage());
         }
     }
 }
-
