@@ -9,7 +9,7 @@
  Linux : ./ed18
  Windows: ed18
 */
-
+ 
 // dependencias
 #include <iostream>
 #include <ctime>
