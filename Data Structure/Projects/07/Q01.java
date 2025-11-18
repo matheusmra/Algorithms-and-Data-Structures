@@ -1003,7 +1003,7 @@ class ArvoreBinaria {
             ultimoResultado = false;
             return caminho;
         }
-        caminho.inserir("raiz");
+        caminho.inserir("raiz ");
         while (true) {
             comparacoes++;
             int cmp = nome.compareTo(atual.elemento.getGameName());
