@@ -876,7 +876,8 @@ class Lista {
      */
     public int tamanho() {
         int tamanho = 0;
-        for (Celula i = primeiro; i != ultimo; i = i.prox, tamanho++);
+        for (Celula i = primeiro; i != ultimo; i = i.prox, tamanho++)
+            ;
         return tamanho;
     }
 }
@@ -937,7 +938,6 @@ class ListaStr {
         ultimo = primeiro;
     }
 
-
     /**
      * Insere um elemento na ultima posicao da lista.
      * 
@@ -950,7 +950,8 @@ class ListaStr {
 
     public int tamanho() {
         int tamanho = 0;
-        for (CelulaStr i = primeiro; i != ultimo; i = i.prox, tamanho++);
+        for (CelulaStr i = primeiro; i != ultimo; i = i.prox, tamanho++)
+            ;
         return tamanho;
     }
 
@@ -958,11 +959,11 @@ class ListaStr {
         if (pos < 0 || pos >= tamanho())
             throw new Exception("Posicao invalida");
         CelulaStr i = primeiro.prox;
-        for (int j = 0; j < pos; j++, i = i.prox);
+        for (int j = 0; j < pos; j++, i = i.prox)
+            ;
         return i.elemento;
     }
 }
-
 
 class No {
     public boolean cor;
@@ -974,9 +975,10 @@ class No {
         this.esq = this.dir = null;
         this.cor = false;
     }
-      public No(Game elemento, boolean cor) {
-    this(elemento, cor, null, null);
-  }
+
+    public No(Game elemento, boolean cor) {
+        this(elemento, cor, null, null);
+    }
 
     public No(Game elemento, boolean cor, No esq, No dir) {
         this.elemento = elemento;
@@ -988,8 +990,8 @@ class No {
 
 class ArvoreAlvinegra {
     private No raiz;
-    private long comparacoes = 0; 
-    private boolean ultimoResultado = false; 
+    private long comparacoes = 0;
+    private boolean ultimoResultado = false;
 
     public ArvoreAlvinegra() {
         raiz = null;
@@ -1000,12 +1002,16 @@ class ArvoreAlvinegra {
     }
 
     private boolean pesquisar(No i, String nome) {
-        if (i == null) return false;
+        if (i == null)
+            return false;
         comparacoes++;
         int cmp = nome.compareTo(i.elemento.getGameName());
-        if (cmp == 0) return true;
-        else if (cmp < 0) return pesquisar(i.esq, nome);
-        else return pesquisar(i.dir, nome);
+        if (cmp == 0)
+            return true;
+        else if (cmp < 0)
+            return pesquisar(i.esq, nome);
+        else
+            return pesquisar(i.dir, nome);
     }
 
     public ListaStr pesquisarCaminho(String nome) {
@@ -1052,164 +1058,108 @@ class ArvoreAlvinegra {
         return ultimoResultado;
     }
 
-     public void inserir(Game elemento) throws Exception {
-        // Se a arvore estiver vazia
+    public void inserir(Game elemento) throws Exception {
+        // Árvore vazia: cria raiz preta
         if (raiz == null) {
-            raiz = new No(elemento);
+            raiz = new No(elemento, false); // false = preto
+        } else {
+            // Insere recursivamente como nó vermelho
+            inserir(elemento, null, null, null, raiz);
             raiz.cor = false;
-            return;
         }
-
-        // Agora a raiz existe; tratar casos onde a raiz tem 0/1/2 filhos
-        // Caso: apenas raiz (sem filhos)
-        if (raiz.esq == null && raiz.dir == null) {
-            int cmp = elemento.getGameName().compareTo(raiz.elemento.getGameName());
-            if (cmp < 0) {
-                raiz.esq = new No(elemento);
-                raiz.dir = new No(raiz.elemento);
-            } else {
-                raiz.esq = new No(raiz.elemento);
-                raiz.dir = new No(elemento);
-                raiz.elemento = raiz.dir.elemento; // manter ordenacao simples
-            }
-            raiz.esq.cor = raiz.dir.cor = false;
-            raiz.cor = false;
-            return;
-        }
-
-        // Caso: raiz e dir (esq == null)
-        if (raiz.esq == null) {
-            int cmp = elemento.getGameName().compareTo(raiz.elemento.getGameName());
-            int cmp2 = (raiz.dir != null) ? elemento.getGameName().compareTo(raiz.dir.elemento.getGameName()) : 1;
-            if (cmp < 0) {
-                raiz.esq = new No(elemento);
-            } else if (cmp2 < 0) {
-                raiz.esq = new No(raiz.elemento);
-                raiz.elemento = elemento;
-            } else {
-                raiz.esq = new No(raiz.elemento);
-                raiz.elemento = raiz.dir.elemento;
-                raiz.dir.elemento = elemento;
-            }
-            raiz.esq.cor = raiz.dir.cor = false;
-            raiz.cor = false;
-            return;
-        }
-
-        // Caso: raiz e esq (dir == null)
-        if (raiz.dir == null) {
-            int cmp = elemento.getGameName().compareTo(raiz.elemento.getGameName());
-            int cmp3 = (raiz.esq != null) ? elemento.getGameName().compareTo(raiz.esq.elemento.getGameName()) : -1;
-            if (cmp > 0) {
-                raiz.dir = new No(elemento);
-            } else if (cmp3 > 0) {
-                raiz.dir = new No(raiz.elemento);
-                raiz.elemento = elemento;
-            } else {
-                raiz.dir = new No(raiz.elemento);
-                raiz.elemento = raiz.esq.elemento;
-                raiz.esq.elemento = elemento;
-            }
-            raiz.esq.cor = raiz.dir.cor = false;
-            raiz.cor = false;
-            return;
-        }
-
-        // Senao, a arvore tem tres ou mais elementos
-        inserir(elemento, null, null, null, raiz);
-        raiz.cor = false;
-     }
+    }
 
     private void balancear(No bisavo, No avo, No pai, No i) {
-      // Se o pai tambem e preto, reequilibrar a arvore, rotacionando o avo
-      if (pai.cor == true) {
-         // 4 tipos de reequilibrios e acoplamento
-         if (pai.elemento.getGameName().compareTo(avo.elemento.getGameName()) > 0) { // rotacao a esquerda ou direita-esquerda
-            if (i.elemento.getGameName().compareTo(pai.elemento.getGameName()) > 0) {
-               avo = rotacaoEsq(avo);
+        // Se o pai tambem e preto, reequilibrar a arvore, rotacionando o avo
+        if (pai.cor == true) {
+            // 4 tipos de reequilibrios e acoplamento
+            if (pai.elemento.getGameName().compareTo(avo.elemento.getGameName()) > 0) { // rotacao a esquerda ou
+                                                                                        // direita-esquerda
+                if (i.elemento.getGameName().compareTo(pai.elemento.getGameName()) > 0) {
+                    avo = rotacaoEsq(avo);
+                } else {
+                    avo = rotacaoDirEsq(avo);
+                }
+            } else { // rotacao a direita ou esquerda-direita
+                if (i.elemento.getGameName().compareTo(pai.elemento.getGameName()) < 0) {
+                    avo = rotacaoDir(avo);
+                } else {
+                    avo = rotacaoEsqDir(avo);
+                }
+            }
+            if (bisavo == null) {
+                raiz = avo;
+            } else if (avo.elemento.getGameName().compareTo(bisavo.elemento.getGameName()) < 0) {
+                bisavo.esq = avo;
             } else {
-               avo = rotacaoDirEsq(avo);
+                bisavo.dir = avo;
             }
-         } else { // rotacao a direita ou esquerda-direita
-            if (i.elemento.getGameName().compareTo(pai.elemento.getGameName()) < 0) {
-               avo = rotacaoDir(avo);
+            // reestabelecer as cores apos a rotacao
+            avo.cor = false;
+            avo.esq.cor = avo.dir.cor = true;
+        } // if(pai.cor == true)
+    }
+
+    private void inserir(Game elemento, No bisavo, No avo, No pai, No i) throws Exception {
+        if (i == null) {
+            if (elemento.getGameName().compareTo(pai.elemento.getGameName()) < 0) {
+                i = pai.esq = new No(elemento, true);
             } else {
-               avo = rotacaoEsqDir(avo);
+                i = pai.dir = new No(elemento, true);
             }
-         }
-         if (bisavo == null) {
-            raiz = avo;
-         } else if (avo.elemento.getGameName().compareTo(bisavo.elemento.getGameName()) < 0) {
-            bisavo.esq = avo;
-         } else {
-            bisavo.dir = avo;
-         }
-         // reestabelecer as cores apos a rotacao
-         avo.cor = false;
-         avo.esq.cor = avo.dir.cor = true;
-      } // if(pai.cor == true)
-   }
-
-   private void inserir(Game elemento, No bisavo, No avo, No pai, No i) throws Exception {
-      if (i == null) {
-         if (elemento.getGameName().compareTo(pai.elemento.getGameName()) < 0) {
-            i = pai.esq = new No(elemento, true);
-         } else {
-            i = pai.dir = new No(elemento, true);
-         }
-         if (pai.cor == true) {
-            balancear(bisavo, avo, pai, i);
-         }
-      } else {
-         // Achou um 4-no: eh preciso fragmeta-lo e reequilibrar a arvore
-         if (i.esq != null && i.dir != null && i.esq.cor == true && i.dir.cor == true) {
-            i.cor = true;
-            i.esq.cor = i.dir.cor = false;
-            if (i == raiz) {
-               i.cor = false;
-            } else if (pai.cor == true) {
-               balancear(bisavo, avo, pai, i);
+            if (pai.cor == true) {
+                balancear(bisavo, avo, pai, i);
             }
-         }
-         if (elemento.getGameName().compareTo(i.elemento.getGameName()) < 0) {
-            inserir(elemento, avo, pai, i, i.esq);
-         } else if (elemento.getGameName().compareTo(i.elemento.getGameName()) > 0) {
-            inserir(elemento, avo, pai, i, i.dir);
-         } else {
-            throw new Exception("Erro inserir (elemento repetido)!");
-         }
-      }
-   }
+        } else {
+            // Achou um 4-no: eh preciso fragmeta-lo e reequilibrar a arvore
+            if (i.esq != null && i.dir != null && i.esq.cor == true && i.dir.cor == true) {
+                i.cor = true;
+                i.esq.cor = i.dir.cor = false;
+                if (i == raiz) {
+                    i.cor = false;
+                } else if (pai.cor == true) {
+                    balancear(bisavo, avo, pai, i);
+                }
+            }
+            if (elemento.getGameName().compareTo(i.elemento.getGameName()) < 0) {
+                inserir(elemento, avo, pai, i, i.esq);
+            } else if (elemento.getGameName().compareTo(i.elemento.getGameName()) > 0) {
+                inserir(elemento, avo, pai, i, i.dir);
+            } else {
+                throw new Exception("Erro inserir (elemento repetido)!");
+            }
+        }
+    }
 
-   private No rotacaoDir(No no) {
+    private No rotacaoDir(No no) {
 
-      No noEsq = no.esq;
-      No noEsqDir = noEsq.dir;
+        No noEsq = no.esq;
+        No noEsqDir = noEsq.dir;
 
-      noEsq.dir = no;
-      no.esq = noEsqDir;
+        noEsq.dir = no;
+        no.esq = noEsqDir;
 
-      return noEsq;
-   }
+        return noEsq;
+    }
 
-   private No rotacaoEsq(No no) {
-      No noDir = no.dir;
-      No noDirEsq = noDir.esq;
+    private No rotacaoEsq(No no) {
+        No noDir = no.dir;
+        No noDirEsq = noDir.esq;
 
-      noDir.esq = no;
-      no.dir = noDirEsq;
-      return noDir;
-   }
+        noDir.esq = no;
+        no.dir = noDirEsq;
+        return noDir;
+    }
 
-   private No rotacaoDirEsq(No no) {
-      no.dir = rotacaoDir(no.dir);
-      return rotacaoEsq(no);
-   }
+    private No rotacaoDirEsq(No no) {
+        no.dir = rotacaoDir(no.dir);
+        return rotacaoEsq(no);
+    }
 
-   private No rotacaoEsqDir(No no) {
-      no.esq = rotacaoEsq(no.esq);
-      return rotacaoDir(no);
-   }
+    private No rotacaoEsqDir(No no) {
+        no.esq = rotacaoEsq(no.esq);
+        return rotacaoDir(no);
+    }
 
 }
 
@@ -1237,10 +1187,13 @@ public class Q04 {
         try (Scanner scanner = new Scanner(System.in, "UTF-8")) {
             String linha;
             while (true) {
-                if (!scanner.hasNextLine()) break;
+                if (!scanner.hasNextLine())
+                    break;
                 linha = scanner.nextLine().trim();
-                if (linha.equals("FIM")) break;
-                if (linha.isEmpty()) continue;
+                if (linha.equals("FIM"))
+                    break;
+                if (linha.isEmpty())
+                    continue;
                 try {
                     int id = Integer.parseInt(linha);
                     Game g = games.buscarPorId(id);
@@ -1256,20 +1209,24 @@ public class Q04 {
             long inicio = System.currentTimeMillis();
             while (scanner.hasNextLine()) {
                 String nome = scanner.nextLine().trim();
-                if (nome.equals("FIM")) break;
-                if (nome.isEmpty()) continue;
+                if (nome.equals("FIM"))
+                    break;
+                if (nome.isEmpty())
+                    continue;
                 ListaStr caminho = arv.pesquisarCaminho(nome);
                 String out = "";
                 for (int i = 0; i < caminho.tamanho(); i++) {
                     try {
-                        if (i > 0) out += " ";
+                        if (i > 0)
+                            out += " ";
                         out += caminho.get(i);
                     } catch (Exception e) {
                         // nao esperado
                     }
                 }
                 boolean existe = arv.getUltimoResultado();
-                if (out.length() > 0) out += " ";
+                if (out.length() > 0)
+                    out += " ";
                 out += (existe ? "SIM" : "NAO");
                 System.out.println(nome + ": =>" + out);
             }
@@ -1284,7 +1241,3 @@ public class Q04 {
         }
     }
 }
-
-
-
-
