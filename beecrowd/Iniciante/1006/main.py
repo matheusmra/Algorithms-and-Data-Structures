@@ -1,0 +1,9 @@
+a = float(input())
+a = a * 2
+b = float(input())
+b = b * 3
+c = float(input())
+c = c * 5
+media = (a + b + c) / 10
+media = round(media,1)
+print('MEDIA =',media)
